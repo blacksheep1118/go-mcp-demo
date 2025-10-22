@@ -31,6 +31,6 @@ make docker-run-mcp_server
 make docker-run-host
 ```
 
-通过使用API管理平台(apifox/postman等)导入swagger/openapi.yaml，配置环境为host addr，访问接口进行对话
+通过使用API管理平台(apifox/postman等)导入swagger/openapi.yaml，配置环境为host url，访问接口进行对话
 
 记忆临时通过map来保存在内存中，重启host会丢失
