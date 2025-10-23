@@ -84,6 +84,7 @@ else
 	case "$*" in \
 		host) PORT_FLAGS="-p 10001:10001" ;; \
 		mcp_local) PORT_FLAGS="-p 10002:10002" ;; \
+		mcp_remote) PORT_FLAGS="-p 10003:10003" ;; \
 		*) PORT_FLAGS="" ;; \
 	esac; \
 	docker run --rm -itd \
@@ -162,4 +163,6 @@ push-%:
 		exit 1; \
 	fi
 
-
+.PHONY: env
+env:
+	cd $(DIR)/docker && docker-compose up -d
