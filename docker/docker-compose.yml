@@ -1,5 +1,9 @@
 version: "3.9"
 
+networks:
+  mcp_net:                # ← 固定名字
+    name: mcp_net
+
 services:
   consul:
     image: hashicorp/consul:1.19.0
@@ -10,6 +14,8 @@ services:
       -server
       -bootstrap-expect=1
       -ui
+      -node=consul-1
+      -datacenter=dc1
       -client=0.0.0.0
       -bind=0.0.0.0
       -data-dir=/consul/data
@@ -21,3 +27,5 @@ services:
 #      CONSUL_BIND_INTERFACE: eth0
     volumes:
       - ./data/consul/data:/consul/data
+    networks:
+      mcp_net: # ← 固定名字

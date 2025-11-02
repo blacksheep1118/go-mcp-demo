@@ -18,7 +18,7 @@ IDL_PATH = $(DIR)/idl
 OUTPUT_PATH = $(DIR)/output
 API_PATH= $(DIR)/cmd/api
 # Docker 网络名称
-DOCKER_NET := go-mcp-net
+DOCKER_NET := mcp_net
 # Docker 镜像前缀和标签
 IMAGE_PREFIX ?= hachimi
 TAG          ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo dev)
@@ -55,72 +55,37 @@ docker-build-%: vendor
 	  -t $(IMAGE_PREFIX)/$*:$(TAG) \
 	  .
 
-# 创建 Docker 网络供容器间HTTP通信
-.PHONY: docker-net
-docker-net:
+.PHONY: pull-run-%
+pull-run-%:
 ifeq ($(OS),Windows_NT)
-	@powershell -NoProfile -ExecutionPolicy Bypass -Command "docker network inspect $(DOCKER_NET) *> $null; if ($$LASTEXITCODE -ne 0) { docker network create $(DOCKER_NET) | Out-Null }"
+	@echo ">> Pulling and running docker (STRICT config - Windows): $*"
+	@docker pull $(REMOTE_REPOSITORY):$*
+	@docker rm -f $* >/dev/null 2>&1 || true
+	@docker run --rm -itd ^
+		--name $* ^
+		--network $(DOCKER_NET) ^
+		--network-alias $* ^
+		-e SERVICE=$* ^
+		-e TZ=Asia/Shanghai ^
+		-v "$(CONFIG_PATH)\config.yaml":/app/config/config.yaml:ro ^
+		$(REMOTE_REPOSITORY):$*
 else
-	@docker network inspect $(DOCKER_NET) >/dev/null 2>&1 || docker network create $(DOCKER_NET)
-endif
-
-.PHONY: docker-run-%
-docker-run-%: docker-build-% docker-net
-ifeq ($(OS),Windows_NT)
-	@echo ">> Running docker (STRICT config - Windows) on network $(DOCKER_NET)"
-	@powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-		"$$cfg='$(CONFIG_PATH)\config.yaml'; if (!(Test-Path $$cfg)) { Write-Error 'ERROR: config.yaml not found'; exit 2 } ;" ^
-		"docker rm -f $* *> $null ;" ^
-		"$${portFlags}=''; if ('$*' -eq 'host') { $${portFlags}='-p 10001:10001' } elseif ('$*' -eq 'mcp_server') { $${portFlags}='-p 10002:10002' } ;" ^
-		"docker run --rm -itd --name $* --network $(DOCKER_NET) --network-alias $* $${portFlags} -e SERVICE=$* -e TZ=Asia/Shanghai -v $$cfg:/app/config/config.yaml:ro $(IMAGE_PREFIX)/$*:$(TAG)"
-else
-	@echo ">> Running docker (STRICT config - Linux) on network $(DOCKER_NET)"
+	@echo ">> Pulling and running docker (STRICT config - Linux): $*"
+	@docker pull $(REMOTE_REPOSITORY):$*
 	@CFG_SRC="$(CONFIG_PATH)/config.yaml"; \
 	if [ ! -f "$$CFG_SRC" ]; then \
 		echo "ERROR: $$CFG_SRC not found. Please create it." >&2; \
 		exit 2; \
 	fi; \
 	docker rm -f $* >/dev/null 2>&1 || true; \
-	case "$*" in \
-		host) PORT_FLAGS="-p 10001:10001" ;; \
-		mcp_local) PORT_FLAGS="-p 10002:10002" ;; \
-		mcp_remote) PORT_FLAGS="-p 10003:10003" ;; \
-		*) PORT_FLAGS="" ;; \
-	esac; \
 	docker run --rm -itd \
 		--name $* \
 		--network $(DOCKER_NET) \
 		--network-alias $* \
-		$$PORT_FLAGS \
 		-e SERVICE=$* \
 		-e TZ=Asia/Shanghai \
 		-v "$$CFG_SRC":/app/config/config.yaml:ro \
-		$(IMAGE_PREFIX)/$*:$(TAG)
-endif
-
-
-.PHONY: pull-run-%
-pull-run-%:
-ifeq ($(OS),Windows_NT)
-		@echo ">> Pulling and running docker (STRICT config - Windows): $*"
-		@docker pull $(REMOTE_REPOSITORY):$*
-		@powershell -NoProfile -ExecutionPolicy Bypass -File "$(DIR)\scripts\docker-run.ps1" -Service "$*" -Image "$(REMOTE_REPOSITORY):$*" -ConfigPath "$(CONFIG_PATH)\config.yaml"
-else
-		@echo ">> Pulling and running docker (STRICT config - Linux): $*"
-		@docker pull $(REMOTE_REPOSITORY):$*
-		@CFG_SRC="$(CONFIG_PATH)/config.yaml"; \
-		if [ ! -f "$$CFG_SRC" ]; then \
-			echo "ERROR: $$CFG_SRC not found. Please create it." >&2; \
-			exit 2; \
-		fi; \
-		docker rm -f $* >/dev/null 2>&1 || true; \
-		docker run --rm -itd \
-			--name $* \
-			--network host \
-			-e SERVICE=$* \
-			-e TZ=Asia/Shanghai \
-			-v "$$CFG_SRC":/app/config/config.yaml:ro \
-			$(REMOTE_REPOSITORY):$*
+		$(REMOTE_REPOSITORY):$*
 endif
 
 # 帮助信息
@@ -165,4 +130,5 @@ push-%:
 
 .PHONY: env
 env:
+	rm -rf $(DIR)/docker/data/consul ; \
 	cd $(DIR)/docker && docker-compose up -d
