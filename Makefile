@@ -58,34 +58,25 @@ docker-build-%: vendor
 .PHONY: pull-run-%
 pull-run-%:
 ifeq ($(OS),Windows_NT)
-	@echo ">> Pulling and running docker (STRICT config - Windows): $*"
-	@docker pull $(REMOTE_REPOSITORY):$*
-	@docker rm -f $* >/dev/null 2>&1 || true
-	@docker run --rm -itd ^
-		--name $* ^
-		--network $(DOCKER_NET) ^
-		--network-alias $* ^
-		-e SERVICE=$* ^
-		-e TZ=Asia/Shanghai ^
-		-v "$(CONFIG_PATH)\config.yaml":/app/config/config.yaml:ro ^
-		$(REMOTE_REPOSITORY):$*
+		@echo ">> Pulling and running docker (STRICT config - Windows): $*"
+		@docker pull $(REMOTE_REPOSITORY):$*
+		@powershell -NoProfile -ExecutionPolicy Bypass -File "$(DIR)\scripts\docker-run.ps1" -Service "$*" -Image "$(REMOTE_REPOSITORY):$*" -ConfigPath "$(CONFIG_PATH)\config.yaml"
 else
-	@echo ">> Pulling and running docker (STRICT config - Linux): $*"
-	@docker pull $(REMOTE_REPOSITORY):$*
-	@CFG_SRC="$(CONFIG_PATH)/config.yaml"; \
-	if [ ! -f "$$CFG_SRC" ]; then \
-		echo "ERROR: $$CFG_SRC not found. Please create it." >&2; \
-		exit 2; \
-	fi; \
-	docker rm -f $* >/dev/null 2>&1 || true; \
-	docker run --rm -itd \
-		--name $* \
-		--network $(DOCKER_NET) \
-		--network-alias $* \
-		-e SERVICE=$* \
-		-e TZ=Asia/Shanghai \
-		-v "$$CFG_SRC":/app/config/config.yaml:ro \
-		$(REMOTE_REPOSITORY):$*
+		@echo ">> Pulling and running docker (STRICT config - Linux): $*"
+		@docker pull $(REMOTE_REPOSITORY):$*
+		@CFG_SRC="$(CONFIG_PATH)/config.yaml"; \
+		if [ ! -f "$$CFG_SRC" ]; then \
+			echo "ERROR: $$CFG_SRC not found. Please create it." >&2; \
+			exit 2; \
+		fi; \
+		docker rm -f $* >/dev/null 2>&1 || true; \
+		docker run --rm -itd \
+			--name $* \
+			--network host \
+			-e SERVICE=$* \
+			-e TZ=Asia/Shanghai \
+			-v "$$CFG_SRC":/app/config/config.yaml:ro \
+			$(REMOTE_REPOSITORY):$*
 endif
 
 # 帮助信息
