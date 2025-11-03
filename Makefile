@@ -55,6 +55,7 @@ docker-build-%: vendor
 	  -t $(IMAGE_PREFIX)/$*:$(TAG) \
 	  .
 
+.PHONY: pull-run-%
 pull-run-%:
 ifeq ($(OS),Windows_NT)
 		@echo ">> Pulling and running docker (STRICT config - Windows): $*"
@@ -69,14 +70,27 @@ else
 			exit 2; \
 		fi; \
 		docker rm -f $* >/dev/null 2>&1 || true; \
-		docker run -itd \
-			--name $* \
-			--network $(DOCKER_NET) \
-			-e SERVICE=$* \
-			-e TZ=Asia/Shanghai \
-			-v "$$CFG_SRC":/app/config/config.yaml:ro \
-			$(REMOTE_REPOSITORY):$*
+		# only expose port for host service
+		if [ "$*" = "host" ]; then \
+			docker run -itd \
+				--name $* \
+				--network ${DOCKER_NET} \
+				-e SERVICE=$* \
+				-e TZ=Asia/Shanghai \
+				-v "$$CFG_SRC":/app/config/config.yaml:ro \
+				-p 10001:10001 \  # only host service exposes port
+				$(REMOTE_REPOSITORY):$*; \
+		else \
+			docker run -itd \
+				--name $* \
+				--network ${DOCKER_NET} \
+				-e SERVICE=$* \
+				-e TZ=Asia/Shanghai \
+				-v "$$CFG_SRC":/app/config/config.yaml:ro \
+				$(REMOTE_REPOSITORY):$*; \
+		fi
 endif
+
 
 # 帮助信息
 .PHONY: help
