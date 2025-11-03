@@ -18,7 +18,7 @@ IDL_PATH = $(DIR)/idl
 OUTPUT_PATH = $(DIR)/output
 API_PATH= $(DIR)/cmd/api
 # Docker 网络名称
-DOCKER_NET := mcp_net
+DOCKER_NET := docker_mcp_net
 # Docker 镜像前缀和标签
 IMAGE_PREFIX ?= hachimi
 TAG          ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo dev)
