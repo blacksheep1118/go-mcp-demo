@@ -78,7 +78,7 @@ else
 				-e SERVICE=$* \
 				-e TZ=Asia/Shanghai \
 				-v "$$CFG_SRC":/app/config/config.yaml:ro \
-				-p 10001:10001 \  # only host service exposes port
+				-p 10001:10001 \
 				$(REMOTE_REPOSITORY):$*; \
 		else \
 			docker run -itd \
