@@ -18,7 +18,14 @@ jobs:
 
     steps:
       - name: Check out the code
-        uses: actions/checkout@v6-beta
+        uses: actions/checkout@v6-beta # 检出后，代码就在 $GITHUB_WORKSPACE 里
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          # 自动从 go.mod 读取版本
+          go-version-file: 'go.mod'
+          cache: true
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
