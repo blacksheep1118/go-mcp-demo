@@ -139,7 +139,7 @@ env:
 
 # only for cd to use
 .PHONY: push-cd-%
-push-cd-%:
+push-cd-%: vendor
 	@if echo "$(SERVICES)" | grep -wq "$*"; then \
 		if [ "$(ARCH)" = "x86_64" ] || [ "$(ARCH)" = "amd64" ]; then \
 			echo "Building and pushing $* for amd64 architecture..."; \
