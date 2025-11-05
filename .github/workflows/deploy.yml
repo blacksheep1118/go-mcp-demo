@@ -35,8 +35,8 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and Push Docker Image
-          working-directory: ${{ github.workspace }}
-          run: make push-${{ github.event.inputs.service }}
+        working-directory: ${{ github.workspace }}
+        run: make push-${{ github.event.inputs.service }}
 
   deploy:
     runs-on: ubuntu-latest
