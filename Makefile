@@ -136,3 +136,20 @@ push-%:
 env:
 	rm -rf $(DIR)/docker/data/consul ; \
 	cd $(DIR)/docker && docker-compose up -d
+
+# only for cd to use
+.PHONY: push-cd-%
+push-cd-%:
+	@if echo "$(SERVICES)" | grep -wq "$*"; then \
+		if [ "$(ARCH)" = "x86_64" ] || [ "$(ARCH)" = "amd64" ]; then \
+			echo "Building and pushing $* for amd64 architecture..."; \
+			docker build --build-arg SERVICE=$* -t $(REMOTE_REPOSITORY):$* -f docker/Dockerfile .; \
+			docker push $(REMOTE_REPOSITORY):$*; \
+		else \
+			echo "Building and pushing $* using buildx for amd64 architecture..."; \
+			docker buildx build --platform linux/amd64 --build-arg SERVICE=$* -t $(REMOTE_REPOSITORY):$* -f docker/Dockerfile --push .; \
+		fi; \
+	else \
+		echo "Service '$*' is not a valid service. Available: [$(SERVICES)]"; \
+		exit 1; \
+	fi
