@@ -36,8 +36,7 @@ jobs:
 
       - name: Build and Push Docker Image
         working-directory: ${{ github.workspace }}
-        run: make push-${{ github.event.inputs.service }}
-
+        run: make push-cd-${{ github.event.inputs.service }}
   deploy:
     runs-on: ubuntu-latest
     environment: eino-deploy
