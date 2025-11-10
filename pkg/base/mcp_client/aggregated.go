@@ -93,6 +93,9 @@ func (a *AggregatedClient) refresh() {
 		if _, ok := target[u]; ok {
 			continue
 		}
+		if u == "fzuhelper-mcp" {
+			continue
+		}
 		cli.Close()
 		delete(a.clients, u)
 		logger.Infof("mcp disconnected: %s", u)
