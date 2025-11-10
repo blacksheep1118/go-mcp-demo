@@ -4,6 +4,7 @@ server:
   name: go-mcp-demo
   log-level: "FATAL" # TRACE|DEBUG|INFO|NOTICE|WARN|ERROR|FATAL
 
+# ai服务配置
 ai_provider:
   mode: "remote" # "local"(ollama) | "remote"(openAI-API)
   base_url: "http://127.0.0.1:11434" # ollama 本地服务地址，仅 mode 为 local 时生效
@@ -23,11 +24,13 @@ ai_provider:
     max_tokens: 1024
     extra: {}
 
+# ai相关配置 todo: 整合到上面
 cli:
   system_prompt: "你是一个可以调用外部工具(MCP)的助手，请在需要时调用合适的工具。"
   history: true
   max_turns: 8
 
+# mcp server配置
 mcp:
   server_name: "http.mcp.demo"
   transport: "http"  # "stdio" | "http"
@@ -37,6 +40,8 @@ mcp:
   #   server_cmd: "./bin/mcp-server"
   #   server_args: []
 
+
+# mcp 服务发现配置
 registry:
   provider: "none"       # "consul" | "none"
   consul:
@@ -48,6 +53,14 @@ registry:
     tag: ""
     scheme: "http"
     path: "/mcp"
+
+# 数据库配置
+pgsql:
+  host: "127.0.0.1"
+  port: 5432
+  database: "go-mcp-demo"
+  user: "go-mcp-demo"
+  password: "go-mcp-demo"
 
 services:
   host:

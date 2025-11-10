@@ -11,6 +11,7 @@ var (
 	MCP          *mcpConfig
 	Server       *server
 	Registry     *registryConfig
+	PgSQL        *pgSqlConfig
 	Service      *service
 	runtimeViper = viper.New()
 )
@@ -34,6 +35,7 @@ func Load(path string, srv string) {
 	MCP = &cfg.MCP
 	Server = &cfg.Server
 	Registry = &cfg.Registry
+	PgSQL = &cfg.PgSQL
 	Service = getService(srv)
 }
 

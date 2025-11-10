@@ -81,6 +81,14 @@ type registryConfig struct {
 	ResolveTimeout  time.Duration `mapstructure:"resolve_timeout"`
 }
 
+type pgSqlConfig struct {
+	Host     string `mapstructure:"host"`
+	Port     uint16 `mapstructure:"port"`
+	Database string `mapstructure:"database"`
+	User     string `mapstructure:"user"`
+	Password string `mapstructure:"password"`
+}
+
 type service struct {
 	Name     string
 	AddrList []string
@@ -93,4 +101,5 @@ type Config struct {
 	CLI        cliConfig        `mapstructure:"cli"`
 	MCP        mcpConfig        `mapstructure:"mcp"`
 	Registry   registryConfig   `mapstructure:"registry"`
+	PgSQL      pgSqlConfig      `mapstructure:"pgsql"`
 }
