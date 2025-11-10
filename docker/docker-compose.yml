@@ -21,6 +21,13 @@ services:
       - ./data/consul/data:/consul/data
     networks:
       - mcp_net  # 加入自定义网络
+#  postgres:
+#    image: m.daocloud.io/docker.io/bitnami/postgresql:latest
+#    container_name: mcp-postgres
+#    ports:
+#        - "5432:5432"
+#    env_file:
+#      -
 
 networks:
   mcp_net:
