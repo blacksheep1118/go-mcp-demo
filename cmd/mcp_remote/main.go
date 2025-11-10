@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"github.com/FantasyRL/go-mcp-demo/config"
-	"github.com/FantasyRL/go-mcp-demo/internal/mcp_local/mcp_inject"
+	"github.com/FantasyRL/go-mcp-demo/internal/mcp/application"
 	"github.com/FantasyRL/go-mcp-demo/pkg/base/mcp_server"
 	"github.com/FantasyRL/go-mcp-demo/pkg/base/tool_set"
 	"github.com/FantasyRL/go-mcp-demo/pkg/constant"
@@ -21,7 +21,7 @@ func init() {
 	flag.Parse()
 	config.Load(*configPath, serviceName)
 	logger.Init(serviceName, config.GetLoggerLevel())
-	toolSet = tool_set.NewToolSet(mcp_inject.WithTimeTool())
+	toolSet = tool_set.NewToolSet(application.WithTimeTool())
 }
 
 func main() {

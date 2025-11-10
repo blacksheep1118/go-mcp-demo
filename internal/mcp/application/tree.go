@@ -1,41 +1,11 @@
-package dev_runner
+package application
 
 import (
-	"context"
 	"fmt"
-	"github.com/mark3labs/mcp-go/mcp"
 	"os"
 	"path/filepath"
 	"strings"
 )
-
-func HandleFsTree(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	args := req.GetArguments()
-	root, _ := args["path"].(string)
-	if root == "" {
-		return mcp.NewToolResultError("missing required arg: path"), nil
-	}
-	depthF, _ := args["depth"].(float64)
-	depth := 4
-	if depthF > 0 {
-		depth = int(depthF)
-	}
-	ignoreStr, _ := args["ignore"].(string)
-	var ignores []string
-	if ignoreStr != "" {
-		for _, s := range strings.Split(ignoreStr, ",") {
-			s = strings.TrimSpace(s)
-			if s != "" {
-				ignores = append(ignores, s)
-			}
-		}
-	}
-	out, err := buildTreeText(root, depth, ignores)
-	if err != nil {
-		return mcp.NewToolResultError(err.Error()), nil
-	}
-	return mcp.NewToolResultText(out), nil
-}
 
 // ===== 辅助：构造目录树（纯 Go, depth/ignore 简化） =====
 func buildTreeText(root string, maxDepth int, ignores []string) (string, error) {

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/FantasyRL/go-mcp-demo/config"
 	"github.com/FantasyRL/go-mcp-demo/pkg/constant"
+	"go.uber.org/zap"
 	"sort"
 	"sync"
 	"time"
@@ -73,7 +74,7 @@ func (a *AggregatedClient) refresh() {
 	// 服务发现
 	serviceToUrls, err := a.resolver.Resolve(a.discoverServices)
 	if err != nil {
-		logger.Errorf("registry resolve: %v", err)
+		logger.Error("registry resolve:", zap.Error(err))
 		return
 	}
 	// 转化为set
@@ -109,6 +110,13 @@ func (a *AggregatedClient) refresh() {
 		a.clients[u] = cli
 		logger.Infof("mcp connected: %s (tools=%d)", u, len(cli.Tools))
 	}
+	// 建立fzu-helper-mcp连接
+	fzuCli, err := NewMCPClient(constant.FzuHelperServerMCPUrl)
+	if err != nil {
+		logger.Errorf("mcp dial %s: %v", constant.FzuHelperServerMCPUrl, err)
+	}
+	a.clients["fzuhelper-mcp"] = fzuCli
+
 	a.rebuildIndex()
 }
 

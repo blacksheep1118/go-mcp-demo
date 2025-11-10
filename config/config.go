@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/spf13/viper"
-	"github.com/west2-online/fzuhelper-server/pkg/constants"
 	"log"
 )
 
@@ -41,7 +40,7 @@ func Load(path string, srv string) {
 // GetLoggerLevel 会返回服务的日志等级
 func GetLoggerLevel() string {
 	if Server == nil {
-		return constants.DefaultLogLevel
+		return "FATAL"
 	}
 	return Server.LogLevel
 }

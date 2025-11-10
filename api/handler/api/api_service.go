@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	api "github.com/FantasyRL/go-mcp-demo/api/model/api"
 	"github.com/FantasyRL/go-mcp-demo/api/pack"
-	"github.com/FantasyRL/go-mcp-demo/internal/host"
+	"github.com/FantasyRL/go-mcp-demo/internal/host/application"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/hertz/pkg/protocol/sse"
@@ -25,7 +25,7 @@ func Chat(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(api.ChatResponse)
-	msg, err := host.NewHost(ctx, clientSet).Chat(1, req.Message)
+	msg, err := application.NewHost(ctx, clientSet).Chat(1, req.Message)
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -59,7 +59,7 @@ func ChatSSE(ctx context.Context, c *app.RequestContext) {
 		}
 	}
 
-	if err := host.NewHost(ctx, clientSet).StreamChatOpenAI(ctx, 1, req.Message, emit); err != nil {
+	if err := application.NewHost(ctx, clientSet).StreamChatOpenAI(ctx, 1, req.Message, emit); err != nil {
 		_ = emit("error", map[string]any{"error": err.Error()})
 		return
 	}

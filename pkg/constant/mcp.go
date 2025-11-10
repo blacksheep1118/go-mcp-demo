@@ -10,6 +10,7 @@ const (
 	MCPDefaultCallTimeout      = 30 * time.Second // MCP调用默认超时时间
 	MCPServerHeartbeatInterval = 25 * time.Second // MCP服务器心跳间隔
 
-	AiProviderModeLocal  = "local"  // 本地模型
-	AiProviderModeRemote = "remote" // 远程模型
+	AiProviderModeLocal   = "local"  // 本地模型
+	AiProviderModeRemote  = "remote" // 远程模型
+	FzuHelperServerMCPUrl = "https://fzuhelper.west2.online/mcp"
 )

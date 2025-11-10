@@ -2,7 +2,7 @@ server:
   private-key: ""
   version: "1.0"
   name: go-mcp-demo
-  log-level: "INFO" # TRACE|DEBUG|INFO|NOTICE|WARN|ERROR|FATAL
+  log-level: "FATAL" # TRACE|DEBUG|INFO|NOTICE|WARN|ERROR|FATAL
 
 ai_provider:
   mode: "remote" # "local"(ollama) | "remote"(openAI-API)
