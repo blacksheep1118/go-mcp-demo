@@ -16,34 +16,49 @@ import (
 )
 
 var (
-	Q    = new(Query)
-	Test *test
+	Q             = new(Query)
+	Conversations *conversations
+	Summaries     *summaries
+	Todolists     *todolists
+	Users         *users
 )
 
 func SetDefault(db *gorm.DB, opts ...gen.DOOption) {
 	*Q = *Use(db, opts...)
-	Test = &Q.Test
+	Conversations = &Q.Conversations
+	Summaries = &Q.Summaries
+	Todolists = &Q.Todolists
+	Users = &Q.Users
 }
 
 func Use(db *gorm.DB, opts ...gen.DOOption) *Query {
 	return &Query{
-		db:   db,
-		Test: newTest(db, opts...),
+		db:            db,
+		Conversations: newConversations(db, opts...),
+		Summaries:     newSummaries(db, opts...),
+		Todolists:     newTodolists(db, opts...),
+		Users:         newUsers(db, opts...),
 	}
 }
 
 type Query struct {
 	db *gorm.DB
 
-	Test test
+	Conversations conversations
+	Summaries     summaries
+	Todolists     todolists
+	Users         users
 }
 
 func (q *Query) Available() bool { return q.db != nil }
 
 func (q *Query) clone(db *gorm.DB) *Query {
 	return &Query{
-		db:   db,
-		Test: q.Test.clone(db),
+		db:            db,
+		Conversations: q.Conversations.clone(db),
+		Summaries:     q.Summaries.clone(db),
+		Todolists:     q.Todolists.clone(db),
+		Users:         q.Users.clone(db),
 	}
 }
 
@@ -57,18 +72,27 @@ func (q *Query) WriteDB() *Query {
 
 func (q *Query) ReplaceDB(db *gorm.DB) *Query {
 	return &Query{
-		db:   db,
-		Test: q.Test.replaceDB(db),
+		db:            db,
+		Conversations: q.Conversations.replaceDB(db),
+		Summaries:     q.Summaries.replaceDB(db),
+		Todolists:     q.Todolists.replaceDB(db),
+		Users:         q.Users.replaceDB(db),
 	}
 }
 
 type queryCtx struct {
-	Test ITestDo
+	Conversations IConversationsDo
+	Summaries     ISummariesDo
+	Todolists     ITodolistsDo
+	Users         IUsersDo
 }
 
 func (q *Query) WithContext(ctx context.Context) *queryCtx {
 	return &queryCtx{
-		Test: q.Test.WithContext(ctx),
+		Conversations: q.Conversations.WithContext(ctx),
+		Summaries:     q.Summaries.WithContext(ctx),
+		Todolists:     q.Todolists.WithContext(ctx),
+		Users:         q.Users.WithContext(ctx),
 	}
 }
 
