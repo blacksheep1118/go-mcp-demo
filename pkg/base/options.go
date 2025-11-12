@@ -3,6 +3,7 @@ package base
 import (
 	"github.com/FantasyRL/go-mcp-demo/config"
 	"github.com/FantasyRL/go-mcp-demo/pkg/base/ai_provider"
+	"github.com/FantasyRL/go-mcp-demo/pkg/base/db"
 	"github.com/FantasyRL/go-mcp-demo/pkg/base/mcp_client"
 	"github.com/FantasyRL/go-mcp-demo/pkg/base/registry/consul"
 	"github.com/FantasyRL/go-mcp-demo/pkg/constant"
@@ -56,5 +57,15 @@ func WithAiProviderClient() Option {
 	return func(clientSet *ClientSet) {
 		cli := ai_provider.NewAiProviderClient()
 		clientSet.AiProviderCli = cli
+	}
+}
+
+func WithDB() Option {
+	return func(clientSet *ClientSet) {
+		actualDB, err := db.InitDBClient()
+		if err != nil {
+			log.Fatalf("failed to initialize gorm db: %s", err)
+		}
+		clientSet.ActualDB = actualDB
 	}
 }

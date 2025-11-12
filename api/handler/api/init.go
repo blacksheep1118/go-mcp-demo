@@ -8,5 +8,9 @@ import (
 var clientSet *base.ClientSet
 
 func Init() {
-	clientSet = base.NewClientSet(base.WithMCPClient([]string{constant.ServiceNameMCPLocal, constant.ServiceNameMCPRemote}), base.WithAiProviderClient())
+	clientSet = base.NewClientSet(
+		base.WithMCPClient([]string{constant.ServiceNameMCPLocal, constant.ServiceNameMCPRemote}),
+		base.WithAiProviderClient(),
+		base.WithDB(),
+	)
 }
