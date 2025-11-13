@@ -82,6 +82,6 @@ func Template(ctx context.Context, c *app.RequestContext) {
 		pack.RespError(c, err)
 		return
 	}
-	resp.Data = u.ID
+	resp.User = pack.BuildUserResp(u)
 	pack.RespData(c, resp)
 }
