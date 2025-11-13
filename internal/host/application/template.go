@@ -7,5 +7,5 @@ import (
 
 func (h *Host) TemplateLogic(req *api.TemplateRequest) (*model.Users, error) {
 	// 这里编排你的业务逻辑
-	return &model.Users{}, nil
+	return h.templateRepository.CreateUserByIDAndName(h.ctx, req.TemplateId, "test")
 }
