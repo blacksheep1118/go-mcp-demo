@@ -710,8 +710,7 @@ func (p *TemplateRequest) String() string {
 }
 
 type TemplateResponse struct {
-	User *model.User     `thrift:"user,1" form:"user" json:"user"`
-	Base *model.BaseResp `thrift:"base,2" form:"base" json:"base"`
+	User *model.User `thrift:"user,1" form:"user" json:"user"`
 }
 
 func NewTemplateResponse() *TemplateResponse {
@@ -730,26 +729,12 @@ func (p *TemplateResponse) GetUser() (v *model.User) {
 	return p.User
 }
 
-var TemplateResponse_Base_DEFAULT *model.BaseResp
-
-func (p *TemplateResponse) GetBase() (v *model.BaseResp) {
-	if !p.IsSetBase() {
-		return TemplateResponse_Base_DEFAULT
-	}
-	return p.Base
-}
-
 var fieldIDToName_TemplateResponse = map[int16]string{
 	1: "user",
-	2: "base",
 }
 
 func (p *TemplateResponse) IsSetUser() bool {
 	return p.User != nil
-}
-
-func (p *TemplateResponse) IsSetBase() bool {
-	return p.Base != nil
 }
 
 func (p *TemplateResponse) Read(iprot thrift.TProtocol) (err error) {
@@ -774,14 +759,6 @@ func (p *TemplateResponse) Read(iprot thrift.TProtocol) (err error) {
 		case 1:
 			if fieldTypeId == thrift.STRUCT {
 				if err = p.ReadField1(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 2:
-			if fieldTypeId == thrift.STRUCT {
-				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
@@ -824,14 +801,6 @@ func (p *TemplateResponse) ReadField1(iprot thrift.TProtocol) error {
 	p.User = _field
 	return nil
 }
-func (p *TemplateResponse) ReadField2(iprot thrift.TProtocol) error {
-	_field := model.NewBaseResp()
-	if err := _field.Read(iprot); err != nil {
-		return err
-	}
-	p.Base = _field
-	return nil
-}
 
 func (p *TemplateResponse) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
@@ -841,10 +810,6 @@ func (p *TemplateResponse) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
-			goto WriteFieldError
-		}
-		if err = p.writeField2(oprot); err != nil {
-			fieldId = 2
 			goto WriteFieldError
 		}
 	}
@@ -880,23 +845,6 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
-}
-
-func (p *TemplateResponse) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("base", thrift.STRUCT, 2); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := p.Base.Write(oprot); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *TemplateResponse) String() string {

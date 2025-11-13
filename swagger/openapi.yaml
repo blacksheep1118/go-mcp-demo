@@ -65,23 +65,6 @@ paths:
                                 $ref: '#/components/schemas/TemplateResponseBody'
 components:
     schemas:
-        BaseResp:
-            title: 基础响应
-            required:
-                - code
-                - msg
-            type: object
-            properties:
-                code:
-                    title: 状态码
-                    type: integer
-                    description: 响应状态码
-                    format: int64
-                msg:
-                    title: 消息
-                    type: string
-                    description: 响应消息
-            description: 所有响应的基础结构
         ChatRequestBody:
             title: 聊天请求
             required:
@@ -134,8 +117,6 @@ components:
             properties:
                 user:
                     $ref: '#/components/schemas/User'
-                base:
-                    $ref: '#/components/schemas/BaseResp'
             description: 示例响应
         User:
             title: 用户信息

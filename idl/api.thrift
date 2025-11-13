@@ -77,11 +77,6 @@ struct TemplateResponse{
         description: "示范用返回值",
         type: "string"
     }')
-    2: model.BaseResp base(api.body="base", openapi.property='{)
-        title: "BaseResp",
-        description: "BaseResp必传",
-        "$ref": "#/components/schemas/BaseResp"
-    }')
 }(
     openapi.schema='{
         title: "示例响应",
