@@ -77,6 +77,11 @@ func Template(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(api.TemplateResponse)
-
-	c.JSON(consts.StatusOK, resp)
+	u, err := application.NewHost(ctx, clientSet).TemplateLogic(&req)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	resp.Data = u.ID
+	pack.RespData(c, resp)
 }
