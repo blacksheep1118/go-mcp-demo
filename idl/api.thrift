@@ -44,8 +44,7 @@ struct ChatSSEHandlerRequest{
     2: optional binary image(api.form="image", api.file_name="image", openapi.property='{
         title: "图片文件",
         description: "可选的图片文件，支持上传图片给AI分析",
-        type: "string",
-        format: "binary"
+        type: "file",
     }')
 }(
      openapi.schema='{
@@ -101,7 +100,7 @@ service ApiService {
     // 非流式对话
     ChatResponse Chat(1: ChatRequest req)(api.post="/api/v1/chat")
     // 流式对话
-    ChatSSEHandlerResponse ChatSSE(1: ChatSSEHandlerRequest req)(api.get="/api/v1/chat/sse")
+    ChatSSEHandlerResponse ChatSSE(1: ChatSSEHandlerRequest req)(api.post="/api/v1/chat/sse")
     // 示例接口 idl写好后运行make hertz-gen-api生成脚手架
     TemplateResponse Template(1: TemplateRequest req)(api.post="/api/v1/template")
 }

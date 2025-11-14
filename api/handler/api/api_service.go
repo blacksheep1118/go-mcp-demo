@@ -56,7 +56,6 @@ func Chat(ctx context.Context, c *app.RequestContext) {
 	pack.RespData(c, resp)
 }
 
-
 // ChatSSE .
 // @router /api/v1/chat/sse [GET]
 // in: api/handler/api/chat_sse.go

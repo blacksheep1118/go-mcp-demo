@@ -18,6 +18,12 @@ paths:
                     application/json:
                         schema:
                             $ref: '#/components/schemas/ChatRequestBody'
+                    multipart/form-data:
+                        schema:
+                            $ref: '#/components/schemas/ChatRequestForm'
+                    application/x-www-form-urlencoded:
+                        schema:
+                            $ref: '#/components/schemas/ChatRequestForm'
             responses:
                 "200":
                     description: Successful response
@@ -26,7 +32,7 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/ChatResponseBody'
     /api/v1/chat/sse:
-        get:
+        post:
             tags:
                 - ApiService
             description: 流式对话
@@ -38,6 +44,14 @@ paths:
                     title: 用户消息
                     type: string
                     description: 用户发送的消息内容
+            requestBody:
+                content:
+                    multipart/form-data:
+                        schema:
+                            $ref: '#/components/schemas/ChatSSEHandlerRequestForm'
+                    application/x-www-form-urlencoded:
+                        schema:
+                            $ref: '#/components/schemas/ChatSSEHandlerRequestForm'
             responses:
                 "200":
                     description: Successful response
@@ -76,6 +90,16 @@ components:
                     type: string
                     description: 用户发送的消息内容
             description: 包含用户消息的聊天请求
+        ChatRequestForm:
+            title: 聊天请求
+            type: object
+            properties:
+                image:
+                    title: 图片文件
+                    type: string
+                    description: 可选的图片文件，支持上传图片给AI分析
+                    format: binary
+            description: 包含用户消息的聊天请求
         ChatResponseBody:
             title: 聊天响应
             required:
@@ -87,6 +111,16 @@ components:
                     type: string
                     description: AI生成的回复内容
             description: 包含AI回复的聊天响应
+        ChatSSEHandlerRequestForm:
+            title: 流式聊天请求
+            type: object
+            properties:
+                image:
+                    title: 图片文件
+                    type: file
+                    description: 可选的图片文件，支持上传图片给AI分析
+                    format: binary
+            description: 包含用户消息的流式聊天请求
         ChatSSEHandlerResponseBody:
             title: 流式聊天响应
             required:
