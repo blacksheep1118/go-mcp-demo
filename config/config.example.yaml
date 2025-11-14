@@ -9,10 +9,10 @@ ai_provider:
   mode: "remote" # "local"(ollama) | "remote"(openAI-API)
   base_url: "http://127.0.0.1:11434" # ollama 本地服务地址，仅 mode 为 local 时生效
   #  model: "qwen3:1.7b"
-  model: "deepseek-chat"
+  model: "qwen3-vl-flash"
   remote:
-    provider: "deepseek" # "openai" | "deepseek" | ...
-    base_url: "https://api.deepseek.com/v1"
+    provider: "aliyun" # "openai" | "deepseek" | ...
+    base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
     api_key: ""
 
   options:
