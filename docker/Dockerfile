@@ -1,5 +1,6 @@
 # 第一阶段：构建应用程序
-FROM golang:1.25 AS builder
+FROM docker.m.daocloud.io/library/golang:1.25 AS builder
+
 # 定义构建参数，在构建镜像的时候需要传入 SERVICE 来表示构建的模块
 ARG SERVICE
 
@@ -20,6 +21,11 @@ WORKDIR /app
 COPY go.mod go.sum ./
 COPY vendor ./vendor
 COPY . .
+
+# 转换脚本文件的行尾符（Windows CRLF -> Linux LF）
+RUN sed -i 's/\r$//' ./docker/script/build.sh && \
+    sed -i 's/\r$//' ./docker/script/entrypoint.sh && \
+    chmod +x ./docker/script/build.sh ./docker/script/entrypoint.sh
 
 # 编译应用程序
 RUN bash ./docker/script/build.sh ${SERVICE}

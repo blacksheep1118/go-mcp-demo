@@ -34,6 +34,9 @@ func newSummaries(db *gorm.DB, opts ...gen.DOOption) summaries {
 	_summaries.CreatedAt = field.NewTime(tableName, "created_at")
 	_summaries.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_summaries.DeletedAt = field.NewField(tableName, "deleted_at")
+	_summaries.Tags = field.NewString(tableName, "tags")
+	_summaries.ToolCalls = field.NewString(tableName, "tool_calls")
+	_summaries.FilePaths = field.NewString(tableName, "file_paths")
 
 	_summaries.fillFieldMap()
 
@@ -50,6 +53,9 @@ type summaries struct {
 	CreatedAt      field.Time   // 创建时间
 	UpdatedAt      field.Time   // 更新时间
 	DeletedAt      field.Field  // 删除时间
+	Tags           field.String // 摘要标签
+	ToolCalls      field.String // 工具调用
+	FilePaths      field.String // 文件路径
 
 	fieldMap map[string]field.Expr
 }
@@ -72,6 +78,9 @@ func (s *summaries) updateTableName(table string) *summaries {
 	s.CreatedAt = field.NewTime(table, "created_at")
 	s.UpdatedAt = field.NewTime(table, "updated_at")
 	s.DeletedAt = field.NewField(table, "deleted_at")
+	s.Tags = field.NewString(table, "tags")
+	s.ToolCalls = field.NewString(table, "tool_calls")
+	s.FilePaths = field.NewString(table, "file_paths")
 
 	s.fillFieldMap()
 
@@ -98,13 +107,16 @@ func (s *summaries) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (s *summaries) fillFieldMap() {
-	s.fieldMap = make(map[string]field.Expr, 6)
+	s.fieldMap = make(map[string]field.Expr, 9)
 	s.fieldMap["id"] = s.ID
 	s.fieldMap["conversation_id"] = s.ConversationID
 	s.fieldMap["summary_text"] = s.SummaryText
 	s.fieldMap["created_at"] = s.CreatedAt
 	s.fieldMap["updated_at"] = s.UpdatedAt
 	s.fieldMap["deleted_at"] = s.DeletedAt
+	s.fieldMap["tags"] = s.Tags
+	s.fieldMap["tool_calls"] = s.ToolCalls
+	s.fieldMap["file_paths"] = s.FilePaths
 }
 
 func (s summaries) clone(db *gorm.DB) summaries {

@@ -11,7 +11,7 @@ import (
 	"github.com/FantasyRL/go-mcp-demo/api/pack"
 	"github.com/FantasyRL/go-mcp-demo/internal/host/application"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	consts "github.com/cloudwego/hertz/pkg/protocol/consts"
 	"github.com/cloudwego/hertz/pkg/protocol/sse"
 )
 
@@ -126,4 +126,28 @@ func Template(ctx context.Context, c *app.RequestContext) {
 	}
 	resp.User = pack.BuildUserResp(u)
 	pack.RespData(c, resp)
+}
+
+// SummarizeConversation .
+// @router /api/v1/conversation/summarize [POST]
+func SummarizeConversation(ctx context.Context, c *app.RequestContext) {
+    var req api.SummarizeConversationRequest
+    if err := c.BindAndValidate(&req); err != nil {
+        c.String(consts.StatusBadRequest, err.Error())
+        return
+    }
+
+    result, err := application.NewHost(ctx, clientSet).SummarizeConversation(req.ConversationID)
+    if err != nil {
+        pack.RespError(c, err)
+        return
+    }
+
+    resp := &api.SummarizeConversationResponse{
+        Summary:       result.Summary,
+        Tags:          result.Tags,
+        ToolCallsJSON: result.ToolCallsJSON, // 统一字段名
+        FilePaths:     result.FilePaths,
+    }
+    pack.RespData(c, resp)
 }

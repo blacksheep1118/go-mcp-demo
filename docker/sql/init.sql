@@ -47,7 +47,10 @@ create table summaries (
     summary_text text        NOT NULL,
     created_at   TIMESTAMP   NOT NULL DEFAULT now(),
     updated_at TIMESTAMP(6) WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at   TIMESTAMP
+    deleted_at   TIMESTAMP,
+    tags        jsonb        NOT NULL,
+    tool_calls  jsonb        NOT NULL,
+    file_paths  jsonb        NOT NULL
 );
 create index idx_summaries_conversation_id
     on summaries (conversation_id);
@@ -58,6 +61,9 @@ comment on column summaries.summary_text is '摘要内容';
 comment on column summaries.created_at is '创建时间';
 comment on column summaries.updated_at is '更新时间';
 comment on column summaries.deleted_at is '删除时间';
+comment on column summaries.tags is '摘要标签';
+comment on column summaries.tool_calls is '工具调用';
+comment on column summaries.file_paths is '文件路径';
 
 create table todolists(
     id           uuid        PRIMARY KEY DEFAULT gen_random_uuid(),

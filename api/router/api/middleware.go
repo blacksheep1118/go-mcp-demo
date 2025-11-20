@@ -38,3 +38,13 @@ func _templateMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _conversationMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _summarizeconversationMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

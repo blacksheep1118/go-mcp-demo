@@ -39,7 +39,7 @@ func main() {
 	// 配置代码生成器
 	genCfg := gen.Config{
 		OutPath:      "pkg/gorm-gen/query", // 生成的查询代码输出路径
-		ModelPkgPath: "pkg/gorm-gen/model", // 生成的模型代码输出路径
+		ModelPkgPath: "model", // 生成的模型代码输出路径
 
 		Mode: gen.WithDefaultQuery | gen.WithQueryInterface, // 生成默认查询方法和查询接口
 
