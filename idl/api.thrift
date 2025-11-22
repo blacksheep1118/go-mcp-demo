@@ -96,6 +96,51 @@ struct TemplateResponse{
     }'
 )
 
+struct SummarizeConversationRequest{
+    1: string conversation_id(api.body="conversation_id", openapi.property='{
+        title: "会话ID",
+        description: "需要总结的会话ID",
+        type: "string"
+    }')
+}(
+    openapi.schema='{
+        title: "总结会话请求",
+        description: "请求总结指定会话的内容",
+        required: ["conversation_id"]
+    }'
+)
+
+struct SummarizeConversationResponse{
+    1: string summary(api.body="summary", openapi.property='{
+        title: "会话总结",
+        description: "会话内容的总结",
+        type: "string"
+    }')
+    2: list<string> tags(api.body="tags", openapi.property='{
+        title: "标签列表",
+        description: "会话相关的标签",
+        type: "array",
+        items: {type: "string"}
+    }')
+    3: string tool_calls_json(api.body="tool_calls_json", openapi.property='{
+        title: "工具调用JSON",
+        description: "工具调用的JSON字符串",
+        type: "string"
+    }')
+    4: map<string,string> notes(api.body="notes", openapi.property='{
+        title: "笔记",
+        description: "AI 或用户针对总结写的任意键值笔记，包含文件路径等信息",
+        type: "object",
+        additionalProperties: { "type": "string" }
+    }')
+}(
+    openapi.schema='{
+        title: "总结会话响应",
+        description: "包含会话总结、标签、工具调用和笔记的响应",
+        required: ["summary", "tags", "tool_calls_json", "notes"]
+    }'
+)
+
 service ApiService {
     // 非流式对话
     ChatResponse Chat(1: ChatRequest req)(api.post="/api/v1/chat")
@@ -103,4 +148,6 @@ service ApiService {
     ChatSSEHandlerResponse ChatSSE(1: ChatSSEHandlerRequest req)(api.post="/api/v1/chat/sse")
     // 示例接口 idl写好后运行make hertz-gen-api生成脚手架
     TemplateResponse Template(1: TemplateRequest req)(api.post="/api/v1/template")
+    // 总结会话
+    SummarizeConversationResponse SummarizeConversation(1: SummarizeConversationRequest req)(api.post="/api/v1/conversation/summarize")
 }

@@ -20,6 +20,9 @@ type Summaries struct {
 	CreatedAt      time.Time      `gorm:"column:created_at;type:timestamp without time zone;not null;default:now();autoCreateTime;comment:创建时间" json:"created_at"`             // 创建时间
 	UpdatedAt      time.Time      `gorm:"column:updated_at;type:timestamp(6) with time zone;not null;default:CURRENT_TIMESTAMP;autoUpdateTime;comment:更新时间" json:"updated_at"` // 更新时间
 	DeletedAt      gorm.DeletedAt `gorm:"column:deleted_at;type:timestamp without time zone;comment:删除时间" json:"deleted_at"`                                                   // 删除时间
+	Tags           string         `gorm:"column:tags;type:jsonb;not null;comment:摘要标签" json:"tags"`                                                                            // 摘要标签
+	ToolCalls      string         `gorm:"column:tool_calls;type:jsonb;not null;comment:工具调用" json:"tool_calls"`                                                                // 工具调用
+	Notes          string         `gorm:"column:notes;type:jsonb;not null;comment:笔记" json:"notes"`                                                                            // 笔记
 }
 
 // TableName Summaries's table name

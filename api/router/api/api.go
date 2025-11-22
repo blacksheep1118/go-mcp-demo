@@ -25,6 +25,10 @@ func Register(r *server.Hertz) {
 			_chat := _v1.Group("/chat", _chatMw()...)
 			_chat.POST("/sse", append(_chatsseMw(), api.ChatSSE)...)
 			_v1.POST("/template", append(_templateMw(), api.Template)...)
+			{
+				_conversation := _v1.Group("/conversation", _conversationMw()...)
+				_conversation.POST("/summarize", append(_summarizeconversationMw(), api.SummarizeConversation)...)
+			}
 		}
 	}
 }
