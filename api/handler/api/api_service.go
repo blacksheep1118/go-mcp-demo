@@ -107,6 +107,28 @@ func ChatSSE(ctx context.Context, c *app.RequestContext) {
 	}
 }
 
+// LoginByJWC 教务处账号密码登录
+func LoginByJWC(c context.Context, ctx *app.RequestContext) {
+	// 1. 取参数
+	type req struct {
+		Username string `json:"username"` // 教务处学号
+		Password string `json:"password"`
+	}
+	var r req
+	if err := ctx.BindAndValidate(&r); err != nil {
+		ctx.JSON(consts.StatusBadRequest, map[string]string{"msg": "参数错误"})
+		return
+	}
+	// 2. 真正登录/注册
+	svc := application.NewUserService()
+	resp, err := svc.LoginByJWC(c, r.Username, r.Password)
+	if err != nil {
+		ctx.JSON(consts.StatusUnauthorized, map[string]string{"msg": err.Error()})
+		return
+	}
+	ctx.JSON(consts.StatusOK, resp)
+}
+
 // Template .
 // @router /api/v1/template [POST]
 func Template(ctx context.Context, c *app.RequestContext) {
