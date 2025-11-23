@@ -119,7 +119,7 @@ func (a *AggregatedClient) refresh() {
 		logger.Errorf("mcp dial %s: %v", constant.FzuHelperServerMCPUrl, err)
 	}
 	a.clients["fzuhelper-mcp"] = fzuCli
-	logger.Infof("fzu-mcp connected: %s (tools=%d)", constant.FzuHelperServerMCPUrl, len(fzuCli.Tools))
+	//logger.Infof("fzu-mcp connected: %s (tools=%d)", constant.FzuHelperServerMCPUrl, len(fzuCli.Tools))
 
 	a.rebuildIndex()
 }

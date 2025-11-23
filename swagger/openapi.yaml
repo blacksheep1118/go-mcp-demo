@@ -59,6 +59,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ChatSSEHandlerResponseBody'
+    /api/v1/conversation/summarize:
+        post:
+            tags:
+                - ApiService
+            description: 总结会话
+            operationId: ApiService_SummarizeConversation
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SummarizeConversationRequestBody'
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SummarizeConversationResponseBody'
     /api/v1/template:
         post:
             tags:
@@ -77,6 +95,37 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/TemplateResponseBody'
+    /api/v1/user/info:
+        get:
+            tags:
+                - ApiService
+            description: 获取用户信息
+            operationId: ApiService_GetUserInfo
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetUserInfoResponseBody'
+    /api/v1/user/login:
+        post:
+            tags:
+                - ApiService
+            description: 获取jwch登录数据
+            operationId: ApiService_GetLoginData
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/GetLoginDataRequestBody'
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetLoginDataResponseBody'
 components:
     schemas:
         ChatRequestBody:
@@ -132,6 +181,100 @@ components:
                     type: string
                     description: AI生成的回复片段
             description: 包含AI回复片段的流式聊天响应
+        GetLoginDataRequestBody:
+            title: 登录请求
+            required:
+                - stu_id
+                - password
+            type: object
+            properties:
+                stu_id:
+                    title: 学号
+                    type: string
+                    description: 福州大学学号
+                password:
+                    title: 密码
+                    type: string
+                    description: 用户的登录密码
+            description: 包含学号和密码的登录请求
+        GetLoginDataResponseBody:
+            title: 登录响应
+            required:
+                - identifier
+                - cookie
+                - access_token
+            type: object
+            properties:
+                identifier:
+                    title: 用户ID
+                    type: string
+                    description: 登录成功后返回的用户唯一标识符
+                cookie:
+                    title: 会话Cookie
+                    type: string
+                    description: 登录成功后返回的会话Cookie
+                access_token:
+                    title: 访问令牌
+                    type: string
+                    description: 登录成功后返回的访问令牌
+            description: 包含用户ID和会话Cookie的登录响应
+        GetUserInfoResponseBody:
+            title: 用户信息响应
+            required:
+                - user_id
+                - username
+            type: object
+            properties:
+                user_id:
+                    title: 用户ID
+                    type: string
+                    description: 用户的唯一标识符
+                username:
+                    title: 用户名
+                    type: string
+                    description: 用户的登录名
+            description: 包含用户ID和用户名的响应
+        SummarizeConversationRequestBody:
+            title: 总结会话请求
+            required:
+                - conversation_id
+            type: object
+            properties:
+                conversation_id:
+                    title: 会话ID
+                    type: string
+                    description: 需要总结的会话ID
+            description: 请求总结指定会话的内容
+        SummarizeConversationResponseBody:
+            title: 总结会话响应
+            required:
+                - summary
+                - tags
+                - tool_calls_json
+                - notes
+            type: object
+            properties:
+                summary:
+                    title: 会话总结
+                    type: string
+                    description: 会话内容的总结
+                tags:
+                    title: 标签列表
+                    type: array
+                    items:
+                        type: string
+                    description: 会话相关的标签
+                tool_calls_json:
+                    title: 工具调用JSON
+                    type: string
+                    description: 工具调用的JSON字符串
+                notes:
+                    title: 笔记
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: AI 或用户针对总结写的任意键值笔记，包含文件路径等信息
+            description: 包含会话总结、标签、工具调用和笔记的响应
         TemplateRequestBody:
             title: 示例请求
             required:

@@ -9,4 +9,6 @@ import (
 type TemplateRepository interface {
 	// CreateUserByIDAndName 这里定义一些示例方法，这样就可以先编排逻辑了，后面再去下层实现接口
 	CreateUserByIDAndName(ctx context.Context, id string, name string) (*model.Users, error)
+	// GetUserByID 通过ID获取用户信息
+	GetUserByID(ctx context.Context, id string) (*model.Users, error)
 }

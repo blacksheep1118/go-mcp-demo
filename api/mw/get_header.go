@@ -2,36 +2,40 @@ package mw
 
 import (
 	"context"
-
+	"github.com/FantasyRL/go-mcp-demo/api/pack"
+	"github.com/FantasyRL/go-mcp-demo/pkg/errno"
+	"github.com/FantasyRL/go-mcp-demo/pkg/jwt"
+	"github.com/FantasyRL/go-mcp-demo/pkg/utils"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 )
 
-type loginDataKey struct{}
-
-// LoginData 中间件往 ctx 里塞的结构
-type LoginData struct {
-	ID     string
-	Cookie string
-}
-
-// GetHeader 把前端带来的 X-Student-Id 与 X-Jwch-Cookie 注入上下文
-func GetHeader() app.HandlerFunc {
-	return func(c context.Context, ctx *app.RequestContext) {
-		id := string(ctx.GetHeader("X-Student-Id"))
-		cookie := string(ctx.GetHeader("X-Jwch-Cookie"))
-		if id == "" || cookie == "" {
-			hlog.Warn("missing jwch header")
-			// 继续走，后面 handler 自己负责报错
+// GetHeaderParams 把前端带来的 Id 与 Cookie 注入上下文
+func GetHeaderParams() app.HandlerFunc {
+	return func(ctx context.Context, c *app.RequestContext) {
+		id := string(c.GetHeader("Id"))
+		cookies := string(c.GetHeader("Cookies"))
+		if id == "" || cookies == "" {
+			pack.RespError(c, errno.AuthInvalid)
+			c.Abort()
+			return
 		}
-		ld := &LoginData{ID: id, Cookie: cookie}
-		c = context.WithValue(c, loginDataKey{}, ld)
-		ctx.Next(c)
+		ld := &utils.LoginData{ID: id, Cookie: cookies}
+		ctx = utils.WithLoginData(ctx, ld)
+		c.Next(ctx)
 	}
 }
 
-// ExtractLoginData 供下游 handler 取出 loginData
-func ExtractLoginData(c context.Context) (*LoginData, bool) {
-	v, ok := c.Value(loginDataKey{}).(*LoginData)
-	return v, ok
+func Auth() app.HandlerFunc {
+	return func(ctx context.Context, c *app.RequestContext) {
+		token := string(c.GetHeader("Authorization"))
+		cliams, err := jwt.VerifyAccessToken(token)
+		if err != nil {
+			pack.RespError(c, err)
+			c.Abort()
+			return
+		}
+		// 将 stu_id 传入 context
+		ctx = utils.WithStuID(ctx, cliams.StudentID)
+		c.Next(ctx)
+	}
 }

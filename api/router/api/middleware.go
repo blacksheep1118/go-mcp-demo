@@ -13,9 +13,7 @@ func rootMw() []app.HandlerFunc {
 }
 
 func _apiMw() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		mw.GetHeader(), // 把教务处 id+cookie 注入 ctx
-	}
+	return nil
 }
 
 func _v1Mw() []app.HandlerFunc {
@@ -45,10 +43,34 @@ func _templateMw() []app.HandlerFunc {
 
 func _conversationMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
 }
 
 func _summarizeconversationMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getaccesstokenMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _userMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getuserinfoMw() []app.HandlerFunc {
+	return []app.HandlerFunc{
+		mw.GetHeaderParams(),
+		mw.Auth(),
+	}
+}
+
+func _getlogindataMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }

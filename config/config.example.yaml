@@ -1,5 +1,5 @@
 server:
-  private-key: ""
+  private-key: "your-secret-key-here-at-least-32-bytes-long-1234567890"
   version: "1.0"
   name: go-mcp-demo
   log-level: "FATAL" # TRACE|DEBUG|INFO|NOTICE|WARN|ERROR|FATAL

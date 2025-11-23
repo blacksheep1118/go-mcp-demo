@@ -107,28 +107,6 @@ func ChatSSE(ctx context.Context, c *app.RequestContext) {
 	}
 }
 
-// LoginByJWC 教务处账号密码登录
-func LoginByJWC(c context.Context, ctx *app.RequestContext) {
-	// 1. 取参数
-	type req struct {
-		Username string `json:"username"` // 教务处学号
-		Password string `json:"password"`
-	}
-	var r req
-	if err := ctx.BindAndValidate(&r); err != nil {
-		ctx.JSON(consts.StatusBadRequest, map[string]string{"msg": "参数错误"})
-		return
-	}
-	// 2. 真正登录/注册
-	svc := application.NewUserService()
-	resp, err := svc.LoginByJWC(c, r.Username, r.Password)
-	if err != nil {
-		ctx.JSON(consts.StatusUnauthorized, map[string]string{"msg": err.Error()})
-		return
-	}
-	ctx.JSON(consts.StatusOK, resp)
-}
-
 // Template .
 // @router /api/v1/template [POST]
 func Template(ctx context.Context, c *app.RequestContext) {
@@ -172,4 +150,49 @@ func SummarizeConversation(ctx context.Context, c *app.RequestContext) {
 		Notes:         result.Notes,
 	}
 	pack.RespData(c, resp)
+}
+
+// GetLoginData .
+// @router /api/v1/user/login [POST]
+func GetLoginData(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.GetLoginDataRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(api.GetLoginDataResponse)
+
+	loginData, err := application.NewHost(ctx, clientSet).Login(req.StuID, req.Password)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	resp.Identifier = loginData.Identifier
+	resp.Cookie = loginData.Cookie
+	resp.AccessToken = loginData.AccessToken
+	pack.RespData(c, resp)
+}
+
+// GetUserInfo .
+// @router /api/v1/user/info [GET]
+func GetUserInfo(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.GetUserInfoRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	//resp := new(api.GetUserInfoResponse)
+
+	info, err := application.NewHost(ctx, clientSet).GetUserInfo()
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+	pack.RespData(c, info)
 }

@@ -29,6 +29,11 @@ func Register(r *server.Hertz) {
 				_conversation := _v1.Group("/conversation", _conversationMw()...)
 				_conversation.POST("/summarize", append(_summarizeconversationMw(), api.SummarizeConversation)...)
 			}
+			{
+				_user := _v1.Group("/user", _userMw()...)
+				_user.GET("/info", append(_getuserinfoMw(), api.GetUserInfo)...)
+				_user.POST("/login", append(_getlogindataMw(), api.GetLoginData)...)
+			}
 		}
 	}
 }

@@ -81,7 +81,6 @@ func main() {
 			})
 		}),
 	))
-	router.RegisterCustom(h) // 这里把 /api/user/login-jwch 注册进去
 	router.Register(h)
 	h.Spin()
 }
