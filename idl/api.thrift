@@ -119,8 +119,7 @@ struct SummarizeConversationResponse{
     2: list<string> tags(api.body="tags", openapi.property='{
         title: "标签列表",
         description: "会话相关的标签",
-        type: "array",
-        items: {type: "string"}
+        type: "array"
     }')
     3: string tool_calls_json(api.body="tool_calls_json", openapi.property='{
         title: "工具调用JSON",
@@ -130,8 +129,7 @@ struct SummarizeConversationResponse{
     4: map<string,string> notes(api.body="notes", openapi.property='{
         title: "笔记",
         description: "AI 或用户针对总结写的任意键值笔记，包含文件路径等信息",
-        type: "object",
-        additionalProperties: { "type": "string" }
+        type: "object"
     }')
 }(
     openapi.schema='{
