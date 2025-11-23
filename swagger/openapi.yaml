@@ -59,6 +59,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/ChatSSEHandlerResponseBody'
+    /api/v1/conversation/summarize:
+        post:
+            tags:
+                - ApiService
+            description: 总结会话
+            operationId: ApiService_SummarizeConversation
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SummarizeConversationRequestBody'
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SummarizeConversationResponseBody'
     /api/v1/template:
         post:
             tags:
@@ -132,6 +150,47 @@ components:
                     type: string
                     description: AI生成的回复片段
             description: 包含AI回复片段的流式聊天响应
+        SummarizeConversationRequestBody:
+            title: 总结会话请求
+            required:
+                - conversation_id
+            type: object
+            properties:
+                conversation_id:
+                    title: 会话ID
+                    type: string
+                    description: 需要总结的会话ID
+            description: 请求总结指定会话的内容
+        SummarizeConversationResponseBody:
+            title: 总结会话响应
+            required:
+                - summary
+                - tags
+                - tool_calls_json
+                - notes
+            type: object
+            properties:
+                summary:
+                    title: 会话总结
+                    type: string
+                    description: 会话内容的总结
+                tags:
+                    title: 标签列表
+                    type: array
+                    items:
+                        type: string
+                    description: 会话相关的标签
+                tool_calls_json:
+                    title: 工具调用JSON
+                    type: string
+                    description: 工具调用的JSON字符串
+                notes:
+                    title: 笔记
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: AI 或用户针对总结写的任意键值笔记，包含文件路径等信息
+            description: 包含会话总结、标签、工具调用和笔记的响应
         TemplateRequestBody:
             title: 示例请求
             required:
