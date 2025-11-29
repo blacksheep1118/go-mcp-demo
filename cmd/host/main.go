@@ -36,6 +36,9 @@ func init() {
 }
 
 func main() {
+	var err error
+
+	// get available port from config set
 	listenAddr, err := utils.GetAvailablePort()
 	if err != nil {
 		logger.Errorf("Api: get available port failed, err: %v", err)
@@ -51,7 +54,7 @@ func main() {
 	// Recovery
 	h.Use(recovery.Recovery(recovery.WithRecoveryHandler(recoveryHandler)))
 
-	// CORS
+	// Cors
 	h.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"*"},
 		AllowCredentials: true,
@@ -78,13 +81,7 @@ func main() {
 			})
 		}),
 	))
-
-	// 注册生成器的路由
 	router.Register(h)
-
-	// 手工注册会话历史查询路由（无需生成器）
-	h.GET("/api/v1/conversation/history", api.GetConversationHistory)
-
 	h.Spin()
 }
 
@@ -102,6 +99,7 @@ func initSentinel() {
 		logger.Fatalf("Unexpected error: %+v", err)
 	}
 
+	// limit QPS to 100
 	_, err = flow.LoadRules([]*flow.Rule{
 		{
 			Resource:               "api",

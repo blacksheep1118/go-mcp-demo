@@ -3,7 +3,6 @@ package application
 import (
 	"context"
 	"errors"
-
 	"github.com/FantasyRL/go-mcp-demo/internal/host/infra"
 	"github.com/FantasyRL/go-mcp-demo/internal/host/repository"
 	"github.com/FantasyRL/go-mcp-demo/pkg/base"
@@ -14,18 +13,16 @@ import (
 	"github.com/openai/openai-go/v2"
 )
 
+// 简单的内存存储用户对话历史
 var history = make(map[int64][]ai_provider.Message)
 var historyOpenAI = make(map[int64][]openai.ChatCompletionMessageParamUnion)
 
 type Host struct {
-	ctx                context.Context
-	mcpCli             mcp_client.ToolClient
-	aiProviderCli      *ai_provider.Client
+	ctx           context.Context
+	mcpCli        mcp_client.ToolClient
+	aiProviderCli *ai_provider.Client
+	// 添加需要的连接
 	templateRepository repository.TemplateRepository
-
-	// 新增：会话持久化与内存缓存
-	conversationRepo repository.ConversationRepository
-	historyStore     *MemoryHistoryStore
 }
 
 func NewHost(ctx context.Context, clientSet *base.ClientSet) *Host {
@@ -34,11 +31,11 @@ func NewHost(ctx context.Context, clientSet *base.ClientSet) *Host {
 		mcpCli:             clientSet.MCPCli,
 		aiProviderCli:      clientSet.AiProviderCli,
 		templateRepository: infra.NewTemplateRepository(db.NewDBWithQuery(clientSet.ActualDB, query.Use)),
-		conversationRepo:   repository.NewConversationRepository(clientSet.ActualDB),
-		historyStore:       NewMemoryHistoryStore(),
 	}
 }
 
+// SummarizeConversation 暴露给 Handler/Service 的入口，负责做一些入参校验并
+// 委托给 summarize.go 中的核心编排逻辑，保持 Host 结构的职责清晰。
 func (h *Host) SummarizeConversation(conversationID string) (*SummarizeResult, error) {
 	if h == nil {
 		return nil, errors.New("host is nil")
@@ -46,9 +43,7 @@ func (h *Host) SummarizeConversation(conversationID string) (*SummarizeResult, e
 	if conversationID == "" {
 		return nil, errors.New("conversation_id is required")
 	}
-	return h.summarizeConversation(conversationID)
-}
 
-func (h *Host) ConversationRepository() repository.ConversationRepository {
-	return h.conversationRepo
+	// 将真正的总结流程留在 summarize.go，便于测试与复用。
+	return h.summarizeConversation(conversationID)
 }
