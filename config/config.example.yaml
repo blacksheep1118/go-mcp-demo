@@ -62,6 +62,10 @@ pgsql:
   user: "go-mcp-demo"
   password: "go-mcp-demo"
 
+redis:
+  addr: 127.0.0.1:6379
+  password: go-mcp-demo
+
 services:
   host:
     name: host

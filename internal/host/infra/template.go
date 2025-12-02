@@ -4,6 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"github.com/FantasyRL/go-mcp-demo/pkg/constant"
+	"github.com/FantasyRL/go-mcp-demo/pkg/logger"
+	"github.com/bytedance/sonic"
+	"github.com/redis/go-redis/v9"
+	"github.com/west2-online/jwch"
 
 	"github.com/FantasyRL/go-mcp-demo/internal/host/repository"
 	"github.com/FantasyRL/go-mcp-demo/pkg/base/db"
@@ -16,11 +22,65 @@ import (
 var _ repository.TemplateRepository = (*TemplateRepository)(nil)
 
 type TemplateRepository struct {
-	db *db.DB[*query.Query]
+	db    *db.DB[*query.Query]
+	cache *redis.Client
 }
 
-func NewTemplateRepository(db *db.DB[*query.Query]) *TemplateRepository {
-	return &TemplateRepository{db: db}
+func (r *TemplateRepository) IsKeyExist(ctx context.Context, key string) bool {
+	return r.cache.Exists(ctx, key).Val() == 1
+}
+
+func (r *TemplateRepository) GetTermsCache(ctx context.Context, key string) (terms []string, err error) {
+	data, err := r.cache.Get(ctx, key).Bytes()
+	if err != nil {
+		return nil, fmt.Errorf("dal.GetTermsCache: cache failed: %w", err)
+	}
+	if err = sonic.Unmarshal(data, &terms); err != nil {
+		return nil, fmt.Errorf("dal.GetTermsCache: Unmarshal failed: %w", err)
+	}
+	return terms, nil
+}
+
+func (r *TemplateRepository) GetCoursesCache(ctx context.Context, key string) (course []*jwch.Course, err error) {
+	course = make([]*jwch.Course, 0)
+	data, err := r.cache.Get(ctx, key).Bytes()
+	if err != nil {
+		return nil, fmt.Errorf("dal.GetCoursesCache: cache failed: %w", err)
+	}
+	if err = sonic.Unmarshal(data, &course); err != nil {
+		return nil, fmt.Errorf("dal.GetCoursesCache: Unmarshal failed: %w", err)
+	}
+	return course, nil
+}
+
+func (r *TemplateRepository) SetTermsCache(ctx context.Context, key string, info []string) error {
+	termJson, err := sonic.Marshal(&info)
+	if err != nil {
+		logger.Errorf("dal.SetTermsCache: Marshal info failed: %v", err)
+		return err
+	}
+	if err = r.cache.Set(ctx, key, termJson, constant.CourseTermsKeyExpire).Err(); err != nil {
+		logger.Errorf("dal.SetTermsCache: Set key failed: %v", err)
+		return err
+	}
+	return nil
+}
+
+func (r *TemplateRepository) SetCoursesCache(ctx context.Context, key string, course []*jwch.Course) error {
+	coursesJson, err := sonic.Marshal(course)
+	if err != nil {
+		logger.Errorf("dal.SetCoursesCache: Marshal info failed: %v", err)
+		return err
+	}
+	if err = r.cache.Set(ctx, key, coursesJson, constant.CourseTermsKeyExpire).Err(); err != nil {
+		logger.Errorf("dal.SetCoursesCache: Set info failed: %v", err)
+		return err
+	}
+	return nil
+}
+
+func NewTemplateRepository(db *db.DB[*query.Query], cache *redis.Client) *TemplateRepository {
+	return &TemplateRepository{db: db, cache: cache}
 }
 
 func (r *TemplateRepository) CreateUserByIDAndName(ctx context.Context, id string, name string) (*model.Users, error) {

@@ -33,6 +33,17 @@ services:
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
         - mcp_net
+  redis:
+    container_name: mcp-redis
+    image: redis:latest
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - "6379:6379"
+    env_file:
+      - "./env/redis.env"
+    networks:
+      - mcp_net
 
 networks:
   mcp_net:

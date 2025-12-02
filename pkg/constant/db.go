@@ -6,4 +6,11 @@ const (
 	DBConnMaxLifetime  = 10 * ONE_SECOND // (DB) 最大可复用时间
 	DBConnMaxIdleTime  = 5 * ONE_MINUTE  // (DB) 最长保持空闲状态时间
 	DBDefaultBatchSize = 100             // (DB) 默认批量插入大小
+
+)
+
+// Expire Time
+const (
+	CourseTermsKeyExpire = 3 * ONE_DAY // [course] 学期列表
+	TermInfoKeyExpire    = 7 * ONE_DAY // [common] 学期详细信息
 )

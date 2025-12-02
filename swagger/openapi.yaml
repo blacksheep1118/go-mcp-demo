@@ -103,6 +103,34 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/SummarizeConversationResponseBody'
+    /api/v1/course/list:
+        get:
+            tags:
+                - ApiService
+            description: |-
+                课程相关接口
+                获取课表
+            operationId: ApiService_GetCourseList
+            parameters:
+                - name: term
+                  in: query
+                  schema:
+                    title: 学期
+                    type: string
+                    description: 查询的学期，例如202501
+                - name: is_refresh
+                  in: query
+                  schema:
+                    title: 是否刷新
+                    type: boolean
+                    description: 是否强制刷新课程数据，默认为false
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CourseListResponseBody'
     /api/v1/template:
         post:
             tags:
@@ -266,6 +294,23 @@ paths:
                                 $ref: '#/components/schemas/GetLoginDataResponseBody'
 components:
     schemas:
+        BaseResp:
+            title: 基础响应
+            required:
+                - code
+                - msg
+            type: object
+            properties:
+                code:
+                    title: 状态码
+                    type: integer
+                    description: 响应状态码
+                    format: int64
+                msg:
+                    title: 消息
+                    type: string
+                    description: 响应消息
+            description: 所有响应的基础结构
         ChatRequestBody:
             title: 聊天请求
             required:
@@ -330,6 +375,109 @@ components:
                     title: 对话ID UUID
                     type: string
             description: 包含AI回复片段的流式聊天响应
+        Course:
+            type: object
+            properties:
+                name:
+                    title: 课程名称
+                    type: string
+                    description: 课程的名称
+                teacher:
+                    title: 教师姓名
+                    type: string
+                    description: 授课教师的姓名
+                scheduleRules:
+                    title: 排课规则
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/CourseScheduleRule'
+                    description: 课程的排课规则列表
+                remark:
+                    title: 备注
+                    type: string
+                    description: 课程的备注信息
+                lessonplan:
+                    title: 授课计划
+                    type: string
+                    description: 课程的授课计划
+                syllabus:
+                    title: 教学大纲
+                    type: string
+                    description: 课程的教学大纲
+                rawScheduleRules:
+                    title: 原始排课规则
+                    type: string
+                    description: 课程的原始排课规则数据
+                rawAdjust:
+                    title: 原始调课规则
+                    type: string
+                    description: 课程的原始调课规则数据
+                examType:
+                    title: 考试类型
+                    type: string
+                    description: 课程的考试类型
+            description: 以下代码来自fzuhelper-server
+        CourseListResponseBody:
+            title: 课程列表响应
+            required:
+                - base
+                - data
+            type: object
+            properties:
+                base:
+                    $ref: '#/components/schemas/BaseResp'
+                data:
+                    title: 课程列表
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Course'
+                    description: 指定学期的课程列表
+            description: 包含课程列表的响应
+        CourseScheduleRule:
+            type: object
+            properties:
+                location:
+                    title: 上课地点
+                    type: string
+                    description: 课程的上课地点
+                startClass:
+                    title: 开始节数
+                    type: integer
+                    description: 课程的开始节数
+                    format: int64
+                endClass:
+                    title: 结束节数
+                    type: integer
+                    description: 课程的结束节数
+                    format: int64
+                startWeek:
+                    title: 起始周
+                    type: integer
+                    description: 课程的起始周数
+                    format: int64
+                endWeek:
+                    title: 结束周
+                    type: integer
+                    description: 课程的结束周数
+                    format: int64
+                weekday:
+                    title: 星期几
+                    type: integer
+                    description: 课程的上课星期几
+                    format: int64
+                single:
+                    title: 单周
+                    type: boolean
+                    description: 课程是否在单周上课
+                double:
+                    title: 双周
+                    type: boolean
+                    description: 课程是否在双周上课
+                adjust:
+                    title: 调课标志
+                    type: boolean
+                    description: 课程是否为调课
+            description: 课程安排
         CreateTodoRequestBody:
             title: 创建待办事项请求
             required:

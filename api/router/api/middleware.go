@@ -112,3 +112,25 @@ func _updatetodoMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _courseMw() []app.HandlerFunc {
+	return []app.HandlerFunc{
+		mw.GetHeaderParams(),
+		mw.Auth(),
+	}
+}
+
+func _getcourselistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _termMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _gettermlistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

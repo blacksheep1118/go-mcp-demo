@@ -548,6 +548,63 @@ struct DeleteTodoResponse {
     }'
 )
 
+struct CourseListRequest {
+    1: required string term(api.query="term", openapi.property='{
+        title: "学期",
+        description: "查询的学期，例如202501",
+        type: "string"
+    }')
+    2: optional bool is_refresh(api.query="is_refresh", openapi.property='{
+        title: "是否刷新",
+        description: "是否强制刷新课程数据，默认为false",
+        type: "boolean"
+    }')
+}(
+    openapi.schema='{
+        title: "课程列表请求",
+        description: "获取指定学期的课程列表",
+        required: ["term"]
+    }'
+)
+
+struct CourseListResponse {
+    1: required model.BaseResp base(api.body="base", openapi.property='{
+        title: "基础响应",
+        description: "响应的基础信息",
+        type: "object"
+    }')
+    2: required list<model.Course> data(api.body="data", openapi.property='{
+        title: "课程列表",
+        description: "指定学期的课程列表",
+        type: "array"
+    }')
+}(
+    openapi.schema='{
+        title: "课程列表响应",
+        description: "包含课程列表的响应",
+        required: ["base", "data"]
+    }'
+)
+
+struct CourseTermListRequest{}(
+    openapi.schema='{
+        title: "学期列表请求",
+        description: "获取可用的学期列表"
+    }')
+
+struct CourseTermListResponse{
+    1: required model.BaseResp base(api.body="base", openapi.property='{
+        title: "基础响应",
+        description: "响应的基础信息",
+        type: "object"
+    }')
+    2: required list<string> data(api.body="data", openapi.property='{
+        title: "学期列表",
+        description: "可用的学期列表",
+        type: "array"
+    }')
+}
+
 service ApiService {
     // 非流式对话
     ChatResponse Chat(1: ChatRequest req)(api.post="/api/v1/chat")
@@ -575,4 +632,10 @@ service ApiService {
     UpdateTodoResponse UpdateTodo(1: UpdateTodoRequest req)(api.put="/api/v1/todo/update")
     // 删除待办事项
     DeleteTodoResponse DeleteTodo(1: DeleteTodoRequest req)(api.delete="/api/v1/todo/delete")
+
+    // 课程相关接口
+    // 获取课表
+    CourseListResponse GetCourseList(1: CourseListRequest req)(api.get="/api/v1/course/list")
+    // 获取学期
+    //CourseTermListResponse GetTermList(1: CourseTermListRequest req)(api.get="/api/v1/course/term/list")
 }

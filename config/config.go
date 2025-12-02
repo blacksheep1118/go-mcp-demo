@@ -13,6 +13,7 @@ var (
 	Registry     *registryConfig
 	PgSQL        *pgSqlConfig
 	Service      *service
+	Redis        *redis
 	runtimeViper = viper.New()
 )
 
@@ -36,6 +37,7 @@ func Load(path string, srv string) {
 	Server = &cfg.Server
 	Registry = &cfg.Registry
 	PgSQL = &cfg.PgSQL
+	Redis = &cfg.Redis
 	Service = getService(srv)
 }
 

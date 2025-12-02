@@ -3,6 +3,7 @@ package base
 import (
 	"github.com/FantasyRL/go-mcp-demo/config"
 	"github.com/FantasyRL/go-mcp-demo/pkg/base/ai_provider"
+	"github.com/FantasyRL/go-mcp-demo/pkg/base/cache"
 	"github.com/FantasyRL/go-mcp-demo/pkg/base/db"
 	"github.com/FantasyRL/go-mcp-demo/pkg/base/mcp_client"
 	"github.com/FantasyRL/go-mcp-demo/pkg/base/registry/consul"
@@ -67,5 +68,15 @@ func WithDB() Option {
 			log.Fatalf("failed to initialize gorm db: %s", err)
 		}
 		clientSet.ActualDB = actualDB
+	}
+}
+
+func WithCache() Option {
+	return func(clientSet *ClientSet) {
+		cacheClient, err := cache.InitRedisClient()
+		if err != nil {
+			log.Fatalf("failed to initialize cache client: %s", err)
+		}
+		clientSet.Cache = cacheClient
 	}
 }

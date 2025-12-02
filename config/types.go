@@ -95,6 +95,11 @@ type service struct {
 	LB       bool `mapstructure:"load-balance"`
 }
 
+type redis struct {
+	Addr     string
+	Password string
+}
+
 type Config struct {
 	Server     server           `mapstructure:"server"`
 	AiProvider AiProviderConfig `mapstructure:"ai_provider"`
@@ -102,4 +107,5 @@ type Config struct {
 	MCP        mcpConfig        `mapstructure:"mcp"`
 	Registry   registryConfig   `mapstructure:"registry"`
 	PgSQL      pgSqlConfig      `mapstructure:"pgsql"`
+	Redis      redis            `mapstructure:"redis"`
 }
