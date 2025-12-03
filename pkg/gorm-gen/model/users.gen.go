@@ -14,11 +14,12 @@ const TableNameUsers = "users"
 
 // Users mapped from table <users>
 type Users struct {
-	ID        string         `gorm:"column:id;type:character varying(32);primaryKey;comment:用户ID,使用oauthID" json:"id"`                                                    // 用户ID,使用oauthID
-	Name      string         `gorm:"column:name;type:character varying(32);not null;comment:用户名称" json:"name"`                                                            // 用户名称
-	CreatedAt time.Time      `gorm:"column:created_at;type:timestamp without time zone;not null;default:CURRENT_TIMESTAMP;autoCreateTime;comment:创建时间" json:"created_at"` // 创建时间
-	UpdatedAt time.Time      `gorm:"column:updated_at;type:timestamp(6) with time zone;not null;default:CURRENT_TIMESTAMP;autoUpdateTime;comment:更新时间" json:"updated_at"` // 更新时间
-	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at;type:timestamp without time zone;comment:删除时间" json:"deleted_at"`                                                   // 删除时间
+	ID          string         `gorm:"column:id;type:character varying(32);primaryKey;comment:用户ID,使用oauthID" json:"id"`                                                    // 用户ID,使用oauthID
+	Name        string         `gorm:"column:name;type:character varying(32);not null;comment:用户名称" json:"name"`                                                            // 用户名称
+	SettingJSON *string        `gorm:"column:setting_json;type:jsonb;comment:用户设置，JSON格式存储" json:"setting_json"`                                                            // 用户设置，JSON格式存储
+	CreatedAt   time.Time      `gorm:"column:created_at;type:timestamp without time zone;not null;default:CURRENT_TIMESTAMP;autoCreateTime;comment:创建时间" json:"created_at"` // 创建时间
+	UpdatedAt   time.Time      `gorm:"column:updated_at;type:timestamp(6) with time zone;not null;default:CURRENT_TIMESTAMP;autoUpdateTime;comment:更新时间" json:"updated_at"` // 更新时间
+	DeletedAt   gorm.DeletedAt `gorm:"column:deleted_at;type:timestamp without time zone;comment:删除时间" json:"deleted_at"`                                                   // 删除时间
 }
 
 // TableName Users's table name

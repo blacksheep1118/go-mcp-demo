@@ -1,6 +1,8 @@
 package application
 
 import (
+	"encoding/json"
+
 	"github.com/FantasyRL/go-mcp-demo/pkg/errno"
 	"github.com/FantasyRL/go-mcp-demo/pkg/jwt"
 	"github.com/FantasyRL/go-mcp-demo/pkg/utils"
@@ -61,4 +63,18 @@ func (h *Host) GetUserInfo() (*jwch.StudentDetail, error) {
 		return nil, err
 	}
 	return info, nil
+}
+
+// UpdateUserSetting 更新用户设置
+func (h *Host) UpdateUserSetting(userID string, settingJSON string) error {
+	if userID == "" {
+		return errno.ParamError
+	}
+	// 验证 JSON 格式
+	var temp map[string]interface{}
+	if err := json.Unmarshal([]byte(settingJSON), &temp); err != nil {
+		return errno.NewErrNo(50001, "invalid JSON format")
+	}
+
+	return h.templateRepository.UpdateUserSetting(h.ctx, userID, settingJSON)
 }

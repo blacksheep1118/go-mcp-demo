@@ -86,9 +86,11 @@ func NewTemplateRepository(db *db.DB[*query.Query], cache *redis.Client) *Templa
 
 func (r *TemplateRepository) CreateUserByIDAndName(ctx context.Context, id string, name string) (*model.Users, error) {
 	d := r.db.Get(ctx)
+	defaultSetting := constant.DefaultUserSettingJSON
 	user := &model.Users{
-		ID:   id,
-		Name: name,
+		ID:          id,
+		Name:        name,
+		SettingJSON: &defaultSetting,
 	}
 	// 由于user是指针类型，Create方法会自动填充user的其他字段（如时间戳）
 	err := d.WithContext(ctx).Users.Create(user)
@@ -107,6 +109,12 @@ func (r *TemplateRepository) GetUserByID(ctx context.Context, id string) (*model
 		return nil, nil
 	}
 	return user, nil
+}
+
+func (r *TemplateRepository) UpdateUserSetting(ctx context.Context, userID string, settingJSON string) error {
+	d := r.db.Get(ctx)
+	_, err := d.WithContext(ctx).Users.Where(d.Users.ID.Eq(userID)).Update(d.Users.SettingJSON, settingJSON)
+	return err
 }
 
 func (r *TemplateRepository) UpsertConversation(

@@ -19,6 +19,8 @@ type TemplateRepository interface {
 	CreateUserByIDAndName(ctx context.Context, id string, name string) (*model.Users, error)
 	// GetUserByID 通过ID获取用户信息
 	GetUserByID(ctx context.Context, id string) (*model.Users, error)
+	// UpdateUserSetting 更新用户设置JSON
+	UpdateUserSetting(ctx context.Context, userID string, settingJSON string) error
 	// UpsertConversation 插入或更新对话记录
 	UpsertConversation(ctx context.Context, userID string, conversationID string, openaiMessages []openai.ChatCompletionMessageParamUnion) error
 	// GetConversationByID 通过ID获取对话记录

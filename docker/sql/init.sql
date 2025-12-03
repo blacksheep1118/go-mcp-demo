@@ -1,6 +1,7 @@
 create table users(
     id VARCHAR(32) NOT NULL PRIMARY KEY,
     name VARCHAR(32) NOT NULL,
+    setting_json JSONB,
     created_at TIMESTAMP NOT NULL DEFAULT current_timestamp,
     updated_at TIMESTAMP(6) WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP NULL
@@ -9,6 +10,7 @@ create table users(
 comment on table users is '用户表';
 comment on column users.id is '用户ID,使用oauthID';
 comment on column users.name is '用户名称';
+comment on column users.setting_json is '用户设置，JSON格式存储';
 comment on column users.created_at is '创建时间';
 comment on column users.updated_at is '更新时间';
 comment on column users.deleted_at is '删除时间';

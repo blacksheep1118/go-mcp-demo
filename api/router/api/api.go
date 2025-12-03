@@ -34,6 +34,10 @@ func Register(r *server.Hertz) {
 			{
 				_course := _v1.Group("/course", _courseMw()...)
 				_course.GET("/list", append(_getcourselistMw(), api.GetCourseList)...)
+				{
+					_term := _course.Group("/term", _termMw()...)
+					_term.GET("/list", append(_gettermlistMw(), api.GetTermList)...)
+				}
 			}
 			{
 				_summary := _v1.Group("/summary", _summaryMw()...)
@@ -41,6 +45,11 @@ func Register(r *server.Hertz) {
 				_summary.GET("/detail", append(_getsummaryMw(), api.GetSummary)...)
 				_summary.GET("/list", append(_listsummaryMw(), api.ListSummary)...)
 				_summary.PUT("/update", append(_updatesummaryMw(), api.UpdateSummary)...)
+			}
+			{
+				_terms := _v1.Group("/terms", _termsMw()...)
+				_terms.GET("/info", append(_gettermMw(), api.GetTerm)...)
+				_terms.GET("/list", append(_gettermslistMw(), api.GetTermsList)...)
 			}
 			{
 				_todo := _v1.Group("/todo", _todoMw()...)
@@ -55,6 +64,7 @@ func Register(r *server.Hertz) {
 				_user := _v1.Group("/user", _userMw()...)
 				_user.GET("/info", append(_getuserinfoMw(), api.GetUserInfo)...)
 				_user.POST("/login", append(_getlogindataMw(), api.GetLoginData)...)
+				_user.PUT("/setting", append(_updateusersettingMw(), api.UpdateUserSetting)...)
 			}
 		}
 	}

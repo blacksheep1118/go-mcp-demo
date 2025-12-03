@@ -144,6 +144,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CourseListResponseBody'
+    /api/v1/course/term/list:
+        get:
+            tags:
+                - ApiService
+            description: 获取学期
+            operationId: ApiService_GetTermList
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CourseTermListResponseBody'
     /api/v1/summary/delete:
         delete:
             tags:
@@ -235,6 +248,39 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/TemplateResponseBody'
+    /api/v1/terms/info:
+        get:
+            tags:
+                - ApiService
+            description: 校历信息：学期详情
+            operationId: ApiService_GetTerm
+            parameters:
+                - name: term
+                  in: query
+                  schema:
+                    title: 学期标识
+                    type: string
+                    description: 要查询的学期标识，例如202501
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TermResponseBody'
+    /api/v1/terms/list:
+        get:
+            tags:
+                - ApiService
+            description: 校历信息：学期列表
+            operationId: ApiService_GetTermsList
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TermListResponseBody'
     /api/v1/todo/create:
         post:
             tags:
@@ -391,6 +437,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/GetLoginDataResponseBody'
+    /api/v1/user/setting:
+        put:
+            tags:
+                - ApiService
+            description: 更新用户设置
+            operationId: ApiService_UpdateUserSetting
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateUserSettingRequestBody'
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateUserSettingResponseBody'
 components:
     schemas:
         BaseResp:
@@ -596,6 +660,17 @@ components:
                     type: boolean
                     description: 课程是否为调课
             description: 课程安排
+        CourseTermListResponseBody:
+            type: object
+            properties:
+                base:
+                    $ref: '#/components/schemas/BaseResp'
+                data:
+                    title: 学期列表
+                    type: array
+                    items:
+                        type: string
+                    description: 可用的学期列表
         CreateTodoRequestBody:
             title: 创建待办事项请求
             required:
@@ -906,6 +981,92 @@ components:
                 user:
                     $ref: '#/components/schemas/User'
             description: 示例响应
+        Term:
+            type: object
+            properties:
+                term_id:
+                    title: 学期ID
+                    type: string
+                    description: 唯一标识学期的ID
+                school_year:
+                    title: 学年
+                    type: string
+                    description: 学期所属的学年
+                term:
+                    title: 学期名称
+                    type: string
+                    description: 学期的名称
+                start_date:
+                    title: 开始日期
+                    type: string
+                    description: 学期的开始日期
+                end_date:
+                    title: 结束日期
+                    type: string
+                    description: 学期的结束日期
+        TermEvent:
+            type: object
+            properties:
+                name:
+                    title: 事件名称
+                    type: string
+                    description: 学期事件的名称
+                start_date:
+                    title: 开始日期
+                    type: string
+                    description: 事件的开始日期
+                end_date:
+                    title: 结束日期
+                    type: string
+                    description: 事件的结束日期
+        TermInfo:
+            type: object
+            properties:
+                term_id:
+                    title: 学期ID
+                    type: string
+                    description: 唯一标识学期的ID
+                term:
+                    title: 学期名称
+                    type: string
+                    description: 学期的名称
+                school_year:
+                    title: 学年
+                    type: string
+                    description: 学期所属的学年
+                events:
+                    title: 学期事件列表
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/TermEvent'
+                    description: 包含学期相关事件的列表
+        TermList:
+            type: object
+            properties:
+                current_term:
+                    title: 当前学期
+                    type: string
+                    description: 当前学期的标识
+                terms:
+                    title: 学期列表
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Term'
+                    description: 包含所有学期的列表
+        TermListResponseBody:
+            type: object
+            properties:
+                base:
+                    $ref: '#/components/schemas/BaseResp'
+                term_lists:
+                    $ref: '#/components/schemas/TermList'
+        TermResponseBody:
+            type: object
+            properties:
+                base:
+                    $ref: '#/components/schemas/BaseResp'
+                term_info:
+                    $ref: '#/components/schemas/TermInfo'
         TodoItem:
             title: 待办事项
             type: object
@@ -1050,6 +1211,28 @@ components:
                     title: 待办事项ID
                     type: string
             description: 返回更新成功的待办事项ID
+        UpdateUserSettingRequestBody:
+            title: 更新用户设置请求
+            required:
+                - setting_json
+            type: object
+            properties:
+                setting_json:
+                    title: 用户设置JSON
+                    type: string
+                    description: 用户设置JSON字符串
+            description: 更新用户个性化设置
+        UpdateUserSettingResponseBody:
+            title: 更新用户设置响应
+            required:
+                - user_id
+            type: object
+            properties:
+                user_id:
+                    title: 用户ID
+                    type: string
+                    description: 更新成功的用户ID
+            description: 返回更新结果
         User:
             title: 用户信息
             required:

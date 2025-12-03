@@ -30,6 +30,7 @@ func newUsers(db *gorm.DB, opts ...gen.DOOption) users {
 	_users.ALL = field.NewAsterisk(tableName)
 	_users.ID = field.NewString(tableName, "id")
 	_users.Name = field.NewString(tableName, "name")
+	_users.SettingJSON = field.NewString(tableName, "setting_json")
 	_users.CreatedAt = field.NewTime(tableName, "created_at")
 	_users.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_users.DeletedAt = field.NewField(tableName, "deleted_at")
@@ -42,12 +43,13 @@ func newUsers(db *gorm.DB, opts ...gen.DOOption) users {
 type users struct {
 	usersDo usersDo
 
-	ALL       field.Asterisk
-	ID        field.String // 用户ID,使用oauthID
-	Name      field.String // 用户名称
-	CreatedAt field.Time   // 创建时间
-	UpdatedAt field.Time   // 更新时间
-	DeletedAt field.Field  // 删除时间
+	ALL         field.Asterisk
+	ID          field.String // 用户ID,使用oauthID
+	Name        field.String // 用户名称
+	SettingJSON field.String // 用户设置，JSON格式存储
+	CreatedAt   field.Time   // 创建时间
+	UpdatedAt   field.Time   // 更新时间
+	DeletedAt   field.Field  // 删除时间
 
 	fieldMap map[string]field.Expr
 }
@@ -66,6 +68,7 @@ func (u *users) updateTableName(table string) *users {
 	u.ALL = field.NewAsterisk(table)
 	u.ID = field.NewString(table, "id")
 	u.Name = field.NewString(table, "name")
+	u.SettingJSON = field.NewString(table, "setting_json")
 	u.CreatedAt = field.NewTime(table, "created_at")
 	u.UpdatedAt = field.NewTime(table, "updated_at")
 	u.DeletedAt = field.NewField(table, "deleted_at")
@@ -93,9 +96,10 @@ func (u *users) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (u *users) fillFieldMap() {
-	u.fieldMap = make(map[string]field.Expr, 5)
+	u.fieldMap = make(map[string]field.Expr, 6)
 	u.fieldMap["id"] = u.ID
 	u.fieldMap["name"] = u.Name
+	u.fieldMap["setting_json"] = u.SettingJSON
 	u.fieldMap["created_at"] = u.CreatedAt
 	u.fieldMap["updated_at"] = u.UpdatedAt
 	u.fieldMap["deleted_at"] = u.DeletedAt

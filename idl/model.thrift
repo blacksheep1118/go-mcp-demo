@@ -138,3 +138,85 @@ struct CourseScheduleRule {
         type: "boolean"
     }')             // 是否是调课
 }
+
+struct Term {
+    1: optional string term_id(api.body="term_id", openapi.property='{
+        title: "学期ID",
+        description: "唯一标识学期的ID",
+        type: "string"
+    }')
+    2: optional string school_year(api.body="school_year", openapi.property='{
+        title: "学年",
+        description: "学期所属的学年",
+        type: "string"
+    }')
+    3: optional string term(api.body="term", openapi.property='{
+        title: "学期名称",
+        description: "学期的名称",
+        type: "string"
+    }')
+    4: optional string start_date(api.body="start_date", openapi.property='{
+        title: "开始日期",
+        description: "学期的开始日期",
+        type: "string"
+    }')
+    5: optional string end_date(api.body="end_date", openapi.property='{
+        title: "结束日期",
+        description: "学期的结束日期",
+        type: "string"
+    }')
+}
+
+struct TermEvent {
+    1: optional string name(api.body="name", openapi.property='{
+        title: "事件名称",
+        description: "学期事件的名称",
+        type: "string"
+    }')
+    2: optional string start_date(api.body="start_date", openapi.property='{
+        title: "开始日期",
+        description: "事件的开始日期",
+        type: "string"
+    }')
+    3: optional string end_date(api.body="end_date", openapi.property='{
+        title: "结束日期",
+        description: "事件的结束日期",
+        type: "string"
+    }')
+}
+
+struct TermList {
+    1: optional string current_term(api.body="current_term", openapi.property='{
+        title: "当前学期",
+        description: "当前学期的标识",
+        type: "string"
+    }')
+    2: optional list<Term> terms(api.body="terms", openapi.property='{
+        title: "学期列表",
+        description: "包含所有学期的列表",
+        type: "array"
+    }')
+}
+
+struct TermInfo {
+    1: optional string term_id(api.body="term_id", openapi.property='{
+        title: "学期ID",
+        description: "唯一标识学期的ID",
+        type: "string"
+    }')
+    2: optional string term(api.body="term", openapi.property='{
+        title: "学期名称",
+        description: "学期的名称",
+        type: "string"
+    }')
+    3: optional string school_year(api.body="school_year", openapi.property='{
+        title: "学年",
+        description: "学期所属的学年",
+        type: "string"
+    }')
+    4: optional list<TermEvent> events(api.body="events", openapi.property='{
+        title: "学期事件列表",
+        description: "包含学期相关事件的列表",
+        type: "array"
+    }')
+}
