@@ -7,12 +7,102 @@ import (
 	"os"
 	"path/filepath"
 	"text/template"
+
 	"github.com/FantasyRL/go-mcp-demo/pkg/logger"
 )
+
 const (
-	// promptsDir 提示词模板目录
-	promptsDir = "internal/host/infra/prompts"
+	// SummarizePrompt summarize 提示词模板
+	SummarizePrompt = `你是一个专业的对话总结助手。请仔细分析以下对话历史，生成一个结构化的总结。
+
+## 用户已有知识库
+
+{{.existing_summaries}}
+
+## 任务要求
+
+1. **相关性识别**：
+   - 仔细检查上面列出的用户已有知识库
+   - 如果当前对话与某个已有知识库的主题高度相关（相似度>70%），请在输出中指定该知识库的ID（related_summary_id字段）
+   - 相关性判断标准：主题相同、讨论的技术点重叠、解决的问题类似
+   - 如果没有相关的知识库，related_summary_id应为空字符串""
+
+2. **文本摘要**：用简洁的中文总结对话的核心内容和主要讨论点（200-300字）
+   - 如果识别到相关知识库，摘要应该是对已有内容的补充和更新，而不是完全独立的新内容
+   
+3. **标签提取**：根据对话主题，提取2-5个标签，如：["技术讨论", "问题解决", "代码审查", "文件操作", "API设计"]等
+
+4. **工具调用信息**：如果对话中涉及工具调用（MCP工具），提取所有工具调用的详细信息，包括：
+   - 工具名称（tool name）
+   - 调用参数（arguments）
+   - 调用目的或结果（简要说明）
+   
+5. **关键文件路径**：如果对话涉及文件操作（读取、写入、创建、删除文件等），提取所有相关的文件路径
+
+## 输出格式
+
+严格输出 JSON，字段：summary、tags、tool_calls、notes、related_summary_id。
+特别说明：
+- notes 必须是一个 JSON 对象（例如 {} 或 {"key":"value"}），不能返回字符串、数组或其它 stringified JSON
+- related_summary_id 是字符串类型，如果识别到相关知识库则填写其ID，否则为空字符串""
+
+{
+  "summary": "对话的核心摘要内容，200-300字（如果有相关知识库，应该是补充性的摘要）",
+  "tags": ["标签1", "标签2", "标签3"],
+  "tool_calls": [
+    {
+      "tool": "工具名称",
+      "args": {
+        "参数名": "参数值"
+      },
+      "description": "工具调用的简要说明"
+    }
+  ],
+  "notes": {
+    "todo": "后续需要接入 DB",
+    "file": "internal/host/infra/prompts/summarize.txt"
+  },
+  "related_summary_id": "如果识别到相关知识库，填写其ID；否则为空字符串"
+}
+
+示例1（无相关知识库）：
+{
+  "summary": "用户询问如何实现对话总结功能...",
+  "tags": ["AI", "总结", "知识库"],
+  "tool_calls": [],
+  "notes": {},
+  "related_summary_id": ""
+}
+
+示例2（有相关知识库）：
+{
+  "summary": "本次对话继续讨论知识库功能的优化，增加了相关性检测逻辑...",
+  "tags": ["AI", "总结", "知识库", "优化"],
+  "tool_calls": [],
+  "notes": {},
+  "related_summary_id": "cc5d0481-c86a-4115-bae1-d749d40ed7ae"
+}
+
+如果没有笔记，请返回空对象 "notes": {}。
+
+## 注意事项
+
+- 如果对话中没有工具调用，` + "`tool_calls`" + ` 应为空数组 ` + "`[]`" + `
+- 如果对话中没有涉及文件操作，` + "`file_paths`" + ` 应为空数组 ` + "`[]`" + `
+- 标签应该准确反映对话的主题和类型
+- 文件路径应该包含完整的相对路径或绝对路径
+- 工具调用的 ` + "`args`" + ` 应该包含完整的参数信息（JSON对象格式）
+- 确保输出的JSON格式完全正确，可以被直接解析
+
+## 对话历史
+
+{{.conversation_history}}
+
+---
+
+请开始分析并生成总结（只输出JSON，不要其他内容）：`
 )
+
 // PromptRepository 负责加载和渲染提示词模板（如 summarize.txt）
 type PromptRepository struct {
 	baseDir string // 模板根目录，例如 "internal/host/infra"
@@ -72,26 +162,15 @@ func (r *PromptRepository) RenderSummarizePrompt(ctx context.Context, data any) 
 	return r.Render(ctx, SummarizePromptPath, data)
 }
 
-// LoadPrompt 从 prompts 目录读取模板文本
-// name 参数对应文件名（不含扩展名），如 "summarize" 对应 "summarize.txt"
+// LoadPrompt 根据名称返回对应的 prompt 模板
+// name 参数对应模板名称，如 "summarize"
 func LoadPrompt(name string) (string, error) {
-	if name == "" {
-		return "", fmt.Errorf("prompt name is required")
+	switch name {
+	case "summarize":
+		return SummarizePrompt, nil
+	default:
+		return "", fmt.Errorf("unknown prompt name: %s", name)
 	}
-
-	// 构建文件路径：name -> prompts/name.txt
-	filename := name + ".txt"
-	filePath := filepath.Join(promptsDir, filename)
-
-	// 读取文件内容
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		logger.Errorf("failed to load prompt template %s: %v", filePath, err)
-		return "", fmt.Errorf("load prompt template %s: %w", name, err)
-	}
-
-	logger.Infof("loaded prompt template: %s", filePath)
-	return string(content), nil
 }
 
 // RenderPrompt 使用 text/template 渲染模板，替换变量占位符
