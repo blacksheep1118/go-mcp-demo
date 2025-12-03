@@ -3,6 +3,7 @@ package application
 import (
 	"context"
 	"errors"
+
 	"github.com/FantasyRL/go-mcp-demo/internal/host/infra"
 	"github.com/FantasyRL/go-mcp-demo/internal/host/repository"
 	"github.com/FantasyRL/go-mcp-demo/pkg/base"
@@ -36,14 +37,17 @@ func NewHost(ctx context.Context, clientSet *base.ClientSet) *Host {
 
 // SummarizeConversation 暴露给 Handler/Service 的入口，负责做一些入参校验并
 // 委托给 summarize.go 中的核心编排逻辑，保持 Host 结构的职责清晰。
-func (h *Host) SummarizeConversation(conversationID string) (*SummarizeResult, error) {
+func (h *Host) SummarizeConversation(conversationID string, userID string) (*SummarizeResult, error) {
 	if h == nil {
 		return nil, errors.New("host is nil")
 	}
 	if conversationID == "" {
 		return nil, errors.New("conversation_id is required")
 	}
+	if userID == "" {
+		return nil, errors.New("user_id is required")
+	}
 
 	// 将真正的总结流程留在 summarize.go，便于测试与复用。
-	return h.summarizeConversation(conversationID)
+	return h.summarizeConversation(conversationID, userID)
 }

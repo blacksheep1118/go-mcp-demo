@@ -85,6 +85,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/GetConversationHistoryResponseBody'
+    /api/v1/conversation/list:
+        get:
+            tags:
+                - ApiService
+            description: 获取对话列表
+            operationId: ApiService_ListConversations
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListConversationsResponseBody'
     /api/v1/conversation/summarize:
         post:
             tags:
@@ -131,6 +144,79 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/CourseListResponseBody'
+    /api/v1/summary/delete:
+        delete:
+            tags:
+                - ApiService
+            description: 删除摘要
+            operationId: ApiService_DeleteSummary
+            parameters:
+                - name: id
+                  in: query
+                  schema:
+                    title: 摘要ID
+                    type: string
+                    description: 要删除的摘要ID
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteSummaryResponseBody'
+    /api/v1/summary/detail:
+        get:
+            tags:
+                - ApiService
+            description: |-
+                知识库(摘要)管理
+                获取摘要详情
+            operationId: ApiService_GetSummary
+            parameters:
+                - name: id
+                  in: query
+                  schema:
+                    title: 摘要ID
+                    type: string
+                    description: 要获取的摘要ID
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetSummaryResponseBody'
+    /api/v1/summary/list:
+        get:
+            tags:
+                - ApiService
+            description: 获取所有摘要列表
+            operationId: ApiService_ListSummary
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListSummaryResponseBody'
+    /api/v1/summary/update:
+        put:
+            tags:
+                - ApiService
+            description: 更新摘要
+            operationId: ApiService_UpdateSummary
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateSummaryRequestBody'
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateSummaryResponseBody'
     /api/v1/template:
         post:
             tags:
@@ -388,6 +474,25 @@ components:
                     title: 对话ID UUID
                     type: string
             description: 包含AI回复片段的流式聊天响应
+        ConversationItem:
+            title: 对话信息
+            type: object
+            properties:
+                id:
+                    title: 对话ID
+                    type: string
+                title:
+                    title: 对话标题
+                    type: string
+                created_at:
+                    title: 创建时间
+                    type: integer
+                    format: int64
+                updated_at:
+                    title: 更新时间
+                    type: integer
+                    format: int64
+            description: 对话的基本信息
         Course:
             type: object
             properties:
@@ -550,6 +655,17 @@ components:
                     type: string
                     description: 创建成功的待办事项ID
             description: 返回创建成功的待办事项ID
+        DeleteSummaryResponseBody:
+            title: 删除摘要响应
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    title: 摘要ID
+                    type: string
+                    description: 已删除的摘要ID
+            description: 返回已删除的摘要ID
         DeleteTodoResponseBody:
             title: 删除待办事项响应
             required:
@@ -612,6 +728,15 @@ components:
                     type: string
                     description: 登录成功后返回的访问令牌
             description: 包含用户ID和会话Cookie的登录响应
+        GetSummaryResponseBody:
+            title: 获取摘要详情响应
+            required:
+                - summary
+            type: object
+            properties:
+                summary:
+                    $ref: '#/components/schemas/SummaryItem'
+            description: 返回摘要详细信息
         GetTodoResponseBody:
             title: 获取待办事项响应
             required:
@@ -637,6 +762,30 @@ components:
                     type: string
                     description: 用户的登录名
             description: 包含用户ID和用户名的响应
+        ListConversationsResponseBody:
+            title: 对话列表响应
+            required:
+                - conversations
+            type: object
+            properties:
+                conversations:
+                    title: 对话列表
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ConversationItem'
+            description: 返回对话列表
+        ListSummaryResponseBody:
+            title: 摘要列表响应
+            required:
+                - summaries
+            type: object
+            properties:
+                summaries:
+                    title: 摘要列表
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SummaryItem'
+            description: 返回摘要列表
         ListTodoResponseBody:
             title: 待办事项列表响应
             required:
@@ -702,6 +851,41 @@ components:
                         type: string
                     description: AI 或用户针对总结写的任意键值笔记，包含文件路径等信息
             description: 包含会话总结、标签、工具调用和笔记的响应
+        SummaryItem:
+            title: 摘要详细信息
+            type: object
+            properties:
+                id:
+                    title: 摘要ID
+                    type: string
+                conversation_id:
+                    title: 对话ID
+                    type: string
+                summary_text:
+                    title: 摘要内容
+                    type: string
+                tags:
+                    title: 标签列表
+                    type: array
+                    items:
+                        type: string
+                tool_calls_json:
+                    title: 工具调用JSON
+                    type: string
+                notes:
+                    title: 笔记
+                    type: object
+                    additionalProperties:
+                        type: string
+                created_at:
+                    title: 创建时间
+                    type: integer
+                    format: int64
+                updated_at:
+                    title: 更新时间
+                    type: integer
+                    format: int64
+            description: 摘要的详细信息
         TemplateRequestBody:
             title: 示例请求
             required:
@@ -773,6 +957,43 @@ components:
                     type: integer
                     format: int64
             description: 待办事项详细信息
+        UpdateSummaryRequestBody:
+            title: 更新摘要请求
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    title: 摘要ID
+                    type: string
+                    description: 要更新的摘要ID
+                summary_text:
+                    title: 摘要内容
+                    type: string
+                tags:
+                    title: 标签列表
+                    type: array
+                    items:
+                        type: string
+                tool_calls_json:
+                    title: 工具调用JSON
+                    type: string
+                notes:
+                    title: 笔记
+                    type: object
+                    additionalProperties:
+                        type: string
+            description: 更新摘要信息，只传需要更新的字段
+        UpdateSummaryResponseBody:
+            title: 更新摘要响应
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    title: 摘要ID
+                    type: string
+            description: 返回更新成功的摘要ID
         UpdateTodoRequestBody:
             title: 更新待办事项请求
             required:

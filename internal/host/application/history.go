@@ -23,3 +23,8 @@ func (h *Host) GetConversation(
 
 	return conversation, nil
 }
+
+// ListConversations 获取用户的所有对话列表
+func (h *Host) ListConversations(userID string) ([]*model.Conversations, error) {
+	return h.templateRepository.ListConversationsByUserID(h.ctx, userID)
+}

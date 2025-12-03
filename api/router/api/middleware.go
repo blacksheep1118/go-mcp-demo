@@ -51,7 +51,9 @@ func _conversationMw() []app.HandlerFunc {
 
 func _summarizeconversationMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
 }
 
 func _getaccesstokenMw() []app.HandlerFunc {
@@ -136,6 +138,38 @@ func _gettermlistMw() []app.HandlerFunc {
 }
 
 func _searchtodoMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _summaryMw() []app.HandlerFunc {
+	// your code...
+	return []app.HandlerFunc{
+		mw.Auth(),
+	}
+}
+
+func _deletesummaryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getsummaryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _listsummaryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _updatesummaryMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _listconversationsMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }

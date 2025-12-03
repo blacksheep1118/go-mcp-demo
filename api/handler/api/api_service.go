@@ -150,7 +150,13 @@ func SummarizeConversation(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	result, err := application.NewHost(ctx, clientSet).SummarizeConversation(req.ConversationID)
+	uid, ok := utils.ExtractStuID(ctx)
+	if !ok {
+		pack.RespError(c, errno.AuthInvalid)
+		return
+	}
+
+	result, err := application.NewHost(ctx, clientSet).SummarizeConversation(req.ConversationID, uid)
 	if err != nil {
 		pack.RespError(c, err)
 		return
@@ -236,6 +242,35 @@ func GetConversationHistory(ctx context.Context, c *app.RequestContext) {
 	resp.ConversationID = history.ID
 	resp.Messages = history.Messages
 
+	pack.RespData(c, resp)
+}
+
+// ListConversations .
+// @router /api/v1/conversation/list [GET]
+func ListConversations(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.ListConversationsRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	uid, ok := utils.ExtractStuID(ctx)
+	if !ok {
+		pack.RespError(c, errno.AuthInvalid)
+		return
+	}
+
+	conversations, err := application.NewHost(ctx, clientSet).ListConversations(uid)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	resp := &api.ListConversationsResponse{
+		Conversations: pack.BuildConversationList(conversations),
+	}
 	pack.RespData(c, resp)
 }
 
@@ -408,6 +443,104 @@ func DeleteTodo(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := &api.DeleteTodoResponse{
+		ID: req.ID,
+	}
+	pack.RespData(c, resp)
+}
+
+// GetSummary .
+// @router /api/v1/summary/detail [GET]
+func GetSummary(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.GetSummaryRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	summary, err := application.NewHost(ctx, clientSet).GetSummaryLogic(req.ID)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	resp := &api.GetSummaryResponse{
+		Summary: pack.BuildSummaryItem(summary),
+	}
+	pack.RespData(c, resp)
+}
+
+// ListSummary .
+// @router /api/v1/summary/list [GET]
+func ListSummary(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.ListSummaryRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	uid, ok := utils.ExtractStuID(ctx)
+	if !ok {
+		pack.RespError(c, errno.AuthInvalid)
+		return
+	}
+
+	summaries, err := application.NewHost(ctx, clientSet).ListSummaryLogic(uid)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	resp := &api.ListSummaryResponse{
+		Summaries: pack.BuildSummaryList(summaries),
+	}
+	pack.RespData(c, resp)
+}
+
+// UpdateSummary .
+// @router /api/v1/summary/update [PUT]
+func UpdateSummary(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.UpdateSummaryRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = application.NewHost(ctx, clientSet).UpdateSummaryLogic(&req)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	resp := &api.UpdateSummaryResponse{
+		ID: req.ID,
+	}
+	pack.RespData(c, resp)
+}
+
+// DeleteSummary .
+// @router /api/v1/summary/delete [DELETE]
+func DeleteSummary(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.DeleteSummaryRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = application.NewHost(ctx, clientSet).DeleteSummaryLogic(req.ID)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	resp := &api.DeleteSummaryResponse{
 		ID: req.ID,
 	}
 	pack.RespData(c, resp)
