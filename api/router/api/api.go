@@ -40,6 +40,7 @@ func Register(r *server.Hertz) {
 				_todo.DELETE("/delete", append(_deletetodoMw(), api.DeleteTodo)...)
 				_todo.GET("/detail", append(_gettodoMw(), api.GetTodo)...)
 				_todo.GET("/list", append(_listtodoMw(), api.ListTodo)...)
+				_todo.GET("/search", append(_searchtodoMw(), api.SearchTodo)...)
 				_todo.PUT("/update", append(_updatetodoMw(), api.UpdateTodo)...)
 			}
 			{

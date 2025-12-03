@@ -68,17 +68,17 @@ func (h *Host) GetTodoLogic(id string, userID string) (*model.Todolists, error) 
 	return todo, nil
 }
 
-// ListTodoLogic 获取待办事项列表（支持多条件筛选）
-func (h *Host) ListTodoLogic(userID string, status *int16, priority *int16, category *string) ([]*model.Todolists, error) {
-	// 如果没有任何筛选条件，返回所有
-	if status == nil && priority == nil && category == nil {
-		todos, err := h.templateRepository.ListTodosByUserID(h.ctx, userID)
-		if err != nil {
-			return nil, err
-		}
-		return todos, nil
+// ListTodoLogic 获取用户的所有待办事项列表
+func (h *Host) ListTodoLogic(userID string) ([]*model.Todolists, error) {
+	todos, err := h.templateRepository.ListTodosByUserID(h.ctx, userID)
+	if err != nil {
+		return nil, err
 	}
+	return todos, nil
+}
 
+// SearchTodoLogic 搜索待办事项（支持多条件筛选）
+func (h *Host) SearchTodoLogic(userID string, status *int16, priority *int16, category *string) ([]*model.Todolists, error) {
 	// 有筛选条件时使用filters方法
 	todos, err := h.templateRepository.ListTodosByFilters(h.ctx, userID, status, priority, category)
 	if err != nil {

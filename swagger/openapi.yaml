@@ -213,8 +213,21 @@ paths:
         get:
             tags:
                 - ApiService
-            description: 获取待办事项列表
+            description: 获取所有待办事项列表
             operationId: ApiService_ListTodo
+            responses:
+                "200":
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListTodoResponseBody'
+    /api/v1/todo/search:
+        get:
+            tags:
+                - ApiService
+            description: 搜索待办事项
+            operationId: ApiService_SearchTodo
             parameters:
                 - name: status
                   in: query
@@ -242,7 +255,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ListTodoResponseBody'
+                                $ref: '#/components/schemas/SearchTodoResponseBody'
     /api/v1/todo/update:
         put:
             tags:
@@ -625,6 +638,18 @@ components:
                     description: 用户的登录名
             description: 包含用户ID和用户名的响应
         ListTodoResponseBody:
+            title: 待办事项列表响应
+            required:
+                - todos
+            type: object
+            properties:
+                todos:
+                    title: 待办事项列表
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/TodoItem'
+            description: 返回待办事项列表
+        SearchTodoResponseBody:
             title: 待办事项列表响应
             required:
                 - todos

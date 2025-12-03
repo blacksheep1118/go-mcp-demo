@@ -4245,9 +4245,6 @@ func (p *GetTodoResponse) String() string {
 }
 
 type ListTodoRequest struct {
-	Status   *int16  `thrift:"status,1,optional" json:"status,omitempty" query:"status"`
-	Priority *int16  `thrift:"priority,2,optional" json:"priority,omitempty" query:"priority"`
-	Category *string `thrift:"category,3,optional" json:"category,omitempty" query:"category"`
 }
 
 func NewListTodoRequest() *ListTodoRequest {
@@ -4257,50 +4254,7 @@ func NewListTodoRequest() *ListTodoRequest {
 func (p *ListTodoRequest) InitDefault() {
 }
 
-var ListTodoRequest_Status_DEFAULT int16
-
-func (p *ListTodoRequest) GetStatus() (v int16) {
-	if !p.IsSetStatus() {
-		return ListTodoRequest_Status_DEFAULT
-	}
-	return *p.Status
-}
-
-var ListTodoRequest_Priority_DEFAULT int16
-
-func (p *ListTodoRequest) GetPriority() (v int16) {
-	if !p.IsSetPriority() {
-		return ListTodoRequest_Priority_DEFAULT
-	}
-	return *p.Priority
-}
-
-var ListTodoRequest_Category_DEFAULT string
-
-func (p *ListTodoRequest) GetCategory() (v string) {
-	if !p.IsSetCategory() {
-		return ListTodoRequest_Category_DEFAULT
-	}
-	return *p.Category
-}
-
-var fieldIDToName_ListTodoRequest = map[int16]string{
-	1: "status",
-	2: "priority",
-	3: "category",
-}
-
-func (p *ListTodoRequest) IsSetStatus() bool {
-	return p.Status != nil
-}
-
-func (p *ListTodoRequest) IsSetPriority() bool {
-	return p.Priority != nil
-}
-
-func (p *ListTodoRequest) IsSetCategory() bool {
-	return p.Category != nil
-}
+var fieldIDToName_ListTodoRequest = map[int16]string{}
 
 func (p *ListTodoRequest) Read(iprot thrift.TProtocol) (err error) {
 
@@ -4319,36 +4273,8 @@ func (p *ListTodoRequest) Read(iprot thrift.TProtocol) (err error) {
 		if fieldTypeId == thrift.STOP {
 			break
 		}
-
-		switch fieldId {
-		case 1:
-			if fieldTypeId == thrift.I16 {
-				if err = p.ReadField1(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 2:
-			if fieldTypeId == thrift.I16 {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 3:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField3(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		default:
-			if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
+		if err = iprot.Skip(fieldTypeId); err != nil {
+			goto SkipFieldTypeError
 		}
 		if err = iprot.ReadFieldEnd(); err != nil {
 			goto ReadFieldEndError
@@ -4363,10 +4289,8 @@ ReadStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_ListTodoRequest[fieldId]), err)
-SkipFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+SkipFieldTypeError:
+	return thrift.PrependError(fmt.Sprintf("%T skip field type %d error", p, fieldTypeId), err)
 
 ReadFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
@@ -4374,58 +4298,11 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *ListTodoRequest) ReadField1(iprot thrift.TProtocol) error {
-
-	var _field *int16
-	if v, err := iprot.ReadI16(); err != nil {
-		return err
-	} else {
-		_field = &v
-	}
-	p.Status = _field
-	return nil
-}
-func (p *ListTodoRequest) ReadField2(iprot thrift.TProtocol) error {
-
-	var _field *int16
-	if v, err := iprot.ReadI16(); err != nil {
-		return err
-	} else {
-		_field = &v
-	}
-	p.Priority = _field
-	return nil
-}
-func (p *ListTodoRequest) ReadField3(iprot thrift.TProtocol) error {
-
-	var _field *string
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		_field = &v
-	}
-	p.Category = _field
-	return nil
-}
-
 func (p *ListTodoRequest) Write(oprot thrift.TProtocol) (err error) {
-	var fieldId int16
 	if err = oprot.WriteStructBegin("ListTodoRequest"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
-		if err = p.writeField1(oprot); err != nil {
-			fieldId = 1
-			goto WriteFieldError
-		}
-		if err = p.writeField2(oprot); err != nil {
-			fieldId = 2
-			goto WriteFieldError
-		}
-		if err = p.writeField3(oprot); err != nil {
-			fieldId = 3
-			goto WriteFieldError
-		}
 	}
 	if err = oprot.WriteFieldStop(); err != nil {
 		goto WriteFieldStopError
@@ -4436,69 +4313,10 @@ func (p *ListTodoRequest) Write(oprot thrift.TProtocol) (err error) {
 	return nil
 WriteStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
-WriteFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
 WriteFieldStopError:
 	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
 WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
-}
-
-func (p *ListTodoRequest) writeField1(oprot thrift.TProtocol) (err error) {
-	if p.IsSetStatus() {
-		if err = oprot.WriteFieldBegin("status", thrift.I16, 1); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteI16(*p.Status); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
-}
-
-func (p *ListTodoRequest) writeField2(oprot thrift.TProtocol) (err error) {
-	if p.IsSetPriority() {
-		if err = oprot.WriteFieldBegin("priority", thrift.I16, 2); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteI16(*p.Priority); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *ListTodoRequest) writeField3(oprot thrift.TProtocol) (err error) {
-	if p.IsSetCategory() {
-		if err = oprot.WriteFieldBegin("category", thrift.STRING, 3); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteString(*p.Category); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
 func (p *ListTodoRequest) String() string {
@@ -4666,6 +4484,431 @@ func (p *ListTodoResponse) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("ListTodoResponse(%+v)", *p)
+
+}
+
+type SearchTodoRequest struct {
+	Status   *int16  `thrift:"status,1,optional" json:"status,omitempty" query:"status"`
+	Priority *int16  `thrift:"priority,2,optional" json:"priority,omitempty" query:"priority"`
+	Category *string `thrift:"category,3,optional" json:"category,omitempty" query:"category"`
+}
+
+func NewSearchTodoRequest() *SearchTodoRequest {
+	return &SearchTodoRequest{}
+}
+
+func (p *SearchTodoRequest) InitDefault() {
+}
+
+var SearchTodoRequest_Status_DEFAULT int16
+
+func (p *SearchTodoRequest) GetStatus() (v int16) {
+	if !p.IsSetStatus() {
+		return SearchTodoRequest_Status_DEFAULT
+	}
+	return *p.Status
+}
+
+var SearchTodoRequest_Priority_DEFAULT int16
+
+func (p *SearchTodoRequest) GetPriority() (v int16) {
+	if !p.IsSetPriority() {
+		return SearchTodoRequest_Priority_DEFAULT
+	}
+	return *p.Priority
+}
+
+var SearchTodoRequest_Category_DEFAULT string
+
+func (p *SearchTodoRequest) GetCategory() (v string) {
+	if !p.IsSetCategory() {
+		return SearchTodoRequest_Category_DEFAULT
+	}
+	return *p.Category
+}
+
+var fieldIDToName_SearchTodoRequest = map[int16]string{
+	1: "status",
+	2: "priority",
+	3: "category",
+}
+
+func (p *SearchTodoRequest) IsSetStatus() bool {
+	return p.Status != nil
+}
+
+func (p *SearchTodoRequest) IsSetPriority() bool {
+	return p.Priority != nil
+}
+
+func (p *SearchTodoRequest) IsSetCategory() bool {
+	return p.Category != nil
+}
+
+func (p *SearchTodoRequest) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I16 {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 2:
+			if fieldTypeId == thrift.I16 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 3:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField3(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_SearchTodoRequest[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *SearchTodoRequest) ReadField1(iprot thrift.TProtocol) error {
+
+	var _field *int16
+	if v, err := iprot.ReadI16(); err != nil {
+		return err
+	} else {
+		_field = &v
+	}
+	p.Status = _field
+	return nil
+}
+func (p *SearchTodoRequest) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field *int16
+	if v, err := iprot.ReadI16(); err != nil {
+		return err
+	} else {
+		_field = &v
+	}
+	p.Priority = _field
+	return nil
+}
+func (p *SearchTodoRequest) ReadField3(iprot thrift.TProtocol) error {
+
+	var _field *string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = &v
+	}
+	p.Category = _field
+	return nil
+}
+
+func (p *SearchTodoRequest) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("SearchTodoRequest"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
+			goto WriteFieldError
+		}
+		if err = p.writeField3(oprot); err != nil {
+			fieldId = 3
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *SearchTodoRequest) writeField1(oprot thrift.TProtocol) (err error) {
+	if p.IsSetStatus() {
+		if err = oprot.WriteFieldBegin("status", thrift.I16, 1); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteI16(*p.Status); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *SearchTodoRequest) writeField2(oprot thrift.TProtocol) (err error) {
+	if p.IsSetPriority() {
+		if err = oprot.WriteFieldBegin("priority", thrift.I16, 2); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteI16(*p.Priority); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *SearchTodoRequest) writeField3(oprot thrift.TProtocol) (err error) {
+	if p.IsSetCategory() {
+		if err = oprot.WriteFieldBegin("category", thrift.STRING, 3); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteString(*p.Category); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+}
+
+func (p *SearchTodoRequest) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("SearchTodoRequest(%+v)", *p)
+
+}
+
+type SearchTodoResponse struct {
+	Todos []*TodoItem `thrift:"todos,1,default,list<TodoItem>" form:"todos" json:"todos"`
+}
+
+func NewSearchTodoResponse() *SearchTodoResponse {
+	return &SearchTodoResponse{}
+}
+
+func (p *SearchTodoResponse) InitDefault() {
+}
+
+func (p *SearchTodoResponse) GetTodos() (v []*TodoItem) {
+	return p.Todos
+}
+
+var fieldIDToName_SearchTodoResponse = map[int16]string{
+	1: "todos",
+}
+
+func (p *SearchTodoResponse) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.LIST {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_SearchTodoResponse[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *SearchTodoResponse) ReadField1(iprot thrift.TProtocol) error {
+	_, size, err := iprot.ReadListBegin()
+	if err != nil {
+		return err
+	}
+	_field := make([]*TodoItem, 0, size)
+	values := make([]TodoItem, size)
+	for i := 0; i < size; i++ {
+		_elem := &values[i]
+		_elem.InitDefault()
+
+		if err := _elem.Read(iprot); err != nil {
+			return err
+		}
+
+		_field = append(_field, _elem)
+	}
+	if err := iprot.ReadListEnd(); err != nil {
+		return err
+	}
+	p.Todos = _field
+	return nil
+}
+
+func (p *SearchTodoResponse) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("SearchTodoResponse"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *SearchTodoResponse) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("todos", thrift.LIST, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.Todos)); err != nil {
+		return err
+	}
+	for _, v := range p.Todos {
+		if err := v.Write(oprot); err != nil {
+			return err
+		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *SearchTodoResponse) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("SearchTodoResponse(%+v)", *p)
 
 }
 
@@ -6504,8 +6747,10 @@ type ApiService interface {
 	CreateTodo(ctx context.Context, req *CreateTodoRequest) (r *CreateTodoResponse, err error)
 	// 获取待办事项详情
 	GetTodo(ctx context.Context, req *GetTodoRequest) (r *GetTodoResponse, err error)
-	// 获取待办事项列表
+	// 获取所有待办事项列表
 	ListTodo(ctx context.Context, req *ListTodoRequest) (r *ListTodoResponse, err error)
+	// 搜索待办事项
+	SearchTodo(ctx context.Context, req *SearchTodoRequest) (r *SearchTodoResponse, err error)
 	// 更新待办事项
 	UpdateTodo(ctx context.Context, req *UpdateTodoRequest) (r *UpdateTodoResponse, err error)
 	// 删除待办事项
@@ -6631,6 +6876,15 @@ func (p *ApiServiceClient) ListTodo(ctx context.Context, req *ListTodoRequest) (
 	}
 	return _result.GetSuccess(), nil
 }
+func (p *ApiServiceClient) SearchTodo(ctx context.Context, req *SearchTodoRequest) (r *SearchTodoResponse, err error) {
+	var _args ApiServiceSearchTodoArgs
+	_args.Req = req
+	var _result ApiServiceSearchTodoResult
+	if err = p.Client_().Call(ctx, "SearchTodo", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
 func (p *ApiServiceClient) UpdateTodo(ctx context.Context, req *UpdateTodoRequest) (r *UpdateTodoResponse, err error) {
 	var _args ApiServiceUpdateTodoArgs
 	_args.Req = req
@@ -6689,6 +6943,7 @@ func NewApiServiceProcessor(handler ApiService) *ApiServiceProcessor {
 	self.AddToProcessorMap("CreateTodo", &apiServiceProcessorCreateTodo{handler: handler})
 	self.AddToProcessorMap("GetTodo", &apiServiceProcessorGetTodo{handler: handler})
 	self.AddToProcessorMap("ListTodo", &apiServiceProcessorListTodo{handler: handler})
+	self.AddToProcessorMap("SearchTodo", &apiServiceProcessorSearchTodo{handler: handler})
 	self.AddToProcessorMap("UpdateTodo", &apiServiceProcessorUpdateTodo{handler: handler})
 	self.AddToProcessorMap("DeleteTodo", &apiServiceProcessorDeleteTodo{handler: handler})
 	self.AddToProcessorMap("GetCourseList", &apiServiceProcessorGetCourseList{handler: handler})
@@ -7175,6 +7430,54 @@ func (p *apiServiceProcessorListTodo) Process(ctx context.Context, seqId int32, 
 		result.Success = retval
 	}
 	if err2 = oprot.WriteMessageBegin("ListTodo", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type apiServiceProcessorSearchTodo struct {
+	handler ApiService
+}
+
+func (p *apiServiceProcessorSearchTodo) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := ApiServiceSearchTodoArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("SearchTodo", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	var err2 error
+	result := ApiServiceSearchTodoResult{}
+	var retval *SearchTodoResponse
+	if retval, err2 = p.handler.SearchTodo(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing SearchTodo: "+err2.Error())
+		oprot.WriteMessageBegin("SearchTodo", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("SearchTodo", thrift.REPLY, seqId); err2 != nil {
 		err = err2
 	}
 	if err2 = result.Write(oprot); err == nil && err2 != nil {
@@ -10273,6 +10576,300 @@ func (p *ApiServiceListTodoResult) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("ApiServiceListTodoResult(%+v)", *p)
+
+}
+
+type ApiServiceSearchTodoArgs struct {
+	Req *SearchTodoRequest `thrift:"req,1"`
+}
+
+func NewApiServiceSearchTodoArgs() *ApiServiceSearchTodoArgs {
+	return &ApiServiceSearchTodoArgs{}
+}
+
+func (p *ApiServiceSearchTodoArgs) InitDefault() {
+}
+
+var ApiServiceSearchTodoArgs_Req_DEFAULT *SearchTodoRequest
+
+func (p *ApiServiceSearchTodoArgs) GetReq() (v *SearchTodoRequest) {
+	if !p.IsSetReq() {
+		return ApiServiceSearchTodoArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+var fieldIDToName_ApiServiceSearchTodoArgs = map[int16]string{
+	1: "req",
+}
+
+func (p *ApiServiceSearchTodoArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *ApiServiceSearchTodoArgs) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_ApiServiceSearchTodoArgs[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *ApiServiceSearchTodoArgs) ReadField1(iprot thrift.TProtocol) error {
+	_field := NewSearchTodoRequest()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.Req = _field
+	return nil
+}
+
+func (p *ApiServiceSearchTodoArgs) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("SearchTodo_args"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *ApiServiceSearchTodoArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Req.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *ApiServiceSearchTodoArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("ApiServiceSearchTodoArgs(%+v)", *p)
+
+}
+
+type ApiServiceSearchTodoResult struct {
+	Success *SearchTodoResponse `thrift:"success,0,optional"`
+}
+
+func NewApiServiceSearchTodoResult() *ApiServiceSearchTodoResult {
+	return &ApiServiceSearchTodoResult{}
+}
+
+func (p *ApiServiceSearchTodoResult) InitDefault() {
+}
+
+var ApiServiceSearchTodoResult_Success_DEFAULT *SearchTodoResponse
+
+func (p *ApiServiceSearchTodoResult) GetSuccess() (v *SearchTodoResponse) {
+	if !p.IsSetSuccess() {
+		return ApiServiceSearchTodoResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+var fieldIDToName_ApiServiceSearchTodoResult = map[int16]string{
+	0: "success",
+}
+
+func (p *ApiServiceSearchTodoResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *ApiServiceSearchTodoResult) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 0:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField0(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_ApiServiceSearchTodoResult[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *ApiServiceSearchTodoResult) ReadField0(iprot thrift.TProtocol) error {
+	_field := NewSearchTodoResponse()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.Success = _field
+	return nil
+}
+
+func (p *ApiServiceSearchTodoResult) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("SearchTodo_result"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField0(oprot); err != nil {
+			fieldId = 0
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *ApiServiceSearchTodoResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Success.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
+}
+
+func (p *ApiServiceSearchTodoResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("ApiServiceSearchTodoResult(%+v)", *p)
 
 }
 

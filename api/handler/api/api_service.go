@@ -314,13 +314,42 @@ func ListTodo(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	todos, err := application.NewHost(ctx, clientSet).ListTodoLogic(uid, req.Status, req.Priority, req.Category)
+	todos, err := application.NewHost(ctx, clientSet).ListTodoLogic(uid)
 	if err != nil {
 		pack.RespError(c, err)
 		return
 	}
 
 	resp := &api.ListTodoResponse{
+		Todos: pack.BuildTodoList(todos),
+	}
+	pack.RespData(c, resp)
+}
+
+// SearchTodo .
+// @router /api/v1/todo/search [GET]
+func SearchTodo(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.SearchTodoRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	uid, ok := utils.ExtractStuID(ctx)
+	if !ok {
+		pack.RespError(c, errno.AuthInvalid)
+		return
+	}
+
+	todos, err := application.NewHost(ctx, clientSet).SearchTodoLogic(uid, req.Status, req.Priority, req.Category)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	resp := &api.SearchTodoResponse{
 		Todos: pack.BuildTodoList(todos),
 	}
 	pack.RespData(c, resp)
@@ -421,5 +450,5 @@ func GetTermList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	pack.RespList(c, terms)
+	pack.RespData(c, terms)
 }

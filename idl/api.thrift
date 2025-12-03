@@ -417,6 +417,27 @@ struct GetTodoResponse {
 )
 
 struct ListTodoRequest {
+}(
+    openapi.schema='{
+        title: "待办事项列表请求",
+        description: "获取用户的所有待办事项"
+    }'
+)
+
+struct ListTodoResponse {
+    1: list<TodoItem> todos(api.body="todos", openapi.property='{
+        title: "待办事项列表",
+        type: "array"
+    }')
+}(
+    openapi.schema='{
+        title: "待办事项列表响应",
+        description: "返回待办事项列表",
+        required: ["todos"]
+    }'
+)
+
+struct SearchTodoRequest {
     1: optional i16 status(api.query="status", openapi.property='{
         title: "状态筛选",
         description: "0-未完成，1-已完成，不传则返回全部",
@@ -434,12 +455,12 @@ struct ListTodoRequest {
     }')
 }(
     openapi.schema='{
-        title: "待办事项列表请求",
-        description: "获取待办事项列表，支持按状态、优先级和分类筛选"
+        title: "搜索待办事项请求",
+        description: "根据条件搜索待办事项，支持按状态、优先级和分类筛选"
     }'
 )
 
-struct ListTodoResponse {
+struct SearchTodoResponse {
     1: list<TodoItem> todos(api.body="todos", openapi.property='{
         title: "待办事项列表",
         type: "array"
@@ -626,8 +647,10 @@ service ApiService {
     CreateTodoResponse CreateTodo(1: CreateTodoRequest req)(api.post="/api/v1/todo/create")
     // 获取待办事项详情
     GetTodoResponse GetTodo(1: GetTodoRequest req)(api.get="/api/v1/todo/detail")
-    // 获取待办事项列表
+    // 获取所有待办事项列表
     ListTodoResponse ListTodo(1: ListTodoRequest req)(api.get="/api/v1/todo/list")
+    // 搜索待办事项
+    SearchTodoResponse SearchTodo(1: SearchTodoRequest req)(api.get="/api/v1/todo/search")
     // 更新待办事项
     UpdateTodoResponse UpdateTodo(1: UpdateTodoRequest req)(api.put="/api/v1/todo/update")
     // 删除待办事项
