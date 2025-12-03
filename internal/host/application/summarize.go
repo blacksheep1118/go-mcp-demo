@@ -12,21 +12,14 @@ import (
 
 	"github.com/FantasyRL/go-mcp-demo/config"
 	"github.com/FantasyRL/go-mcp-demo/internal/host/infra"
+	"github.com/FantasyRL/go-mcp-demo/pkg/gorm-gen/model"
 	"github.com/FantasyRL/go-mcp-demo/pkg/logger"
 	openai "github.com/openai/openai-go/v2"
 )
 
 const (
-	mockConversationID  = "00000000-0000-0000-0000-000000000001"
 	summarizePromptName = "summarize"
 )
-
-var mockConversationHistory = []string{
-	"[User] 今天的任务是为 go-mcp 项目增加对话总结能力，已经完成 IDL 更新。",
-	"[Assistant] 已记录，后续需要补上提示词和数据库落盘。",
-	"[Tool] file.write -> internal/host/infra/prompts/summarize.txt",
-	"[User] 记得把 tags、tool_calls、notes 都写入 summaries 表。",
-}
 
 type SummarizeResult struct {
 	Summary       string
@@ -124,13 +117,17 @@ func (p *conversationSummaryPayload) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (h *Host) buildSummarizePrompt(conversationID string) (string, error) {
+func (h *Host) buildSummarizePrompt(ctx context.Context, conversationID string) (string, error) {
 	tpl, err := infra.LoadPrompt(summarizePromptName)
 	if err != nil {
 		return "", fmt.Errorf("load summarize prompt: %w", err)
 	}
 
-	history := selectConversationHistory(conversationID)
+	history, err := h.selectConversationHistory(ctx, conversationID)
+	if err != nil {
+		return "", fmt.Errorf("get conversation history: %w", err)
+	}
+
 	rendered, err := infra.RenderPrompt(tpl, map[string]any{
 		"conversation_id":      conversationID,
 		"conversation_history": strings.Join(history, "\n"),
@@ -172,13 +169,49 @@ func (h *Host) invokeSummarizeModel(ctx context.Context, prompt string) (string,
 	return strings.TrimSpace(resp.Choices[0].Message.Content), nil
 }
 
-func selectConversationHistory(conversationID string) []string {
-	if conversationID == mockConversationID {
-		return mockConversationHistory
+func (h *Host) selectConversationHistory(ctx context.Context, conversationID string) ([]string, error) {
+	// 从数据库获取对话记录
+	conversation, err := h.templateRepository.GetConversationByID(ctx, conversationID)
+	if err != nil {
+		return nil, fmt.Errorf("get conversation failed: %w", err)
 	}
-	return []string{
-		fmt.Sprintf("[System] conversation_id=%s 未命中 mock 数据，返回空历史。", conversationID),
+	if conversation == nil {
+		return nil, fmt.Errorf("conversation not found: %s", conversationID)
 	}
+
+	// 解析messages字段（jsonb格式）
+	// Messages格式示例：[{"role":"user","content":"..."},{"role":"assistant","content":"..."}]
+	var messages []map[string]interface{}
+	if err := json.Unmarshal([]byte(conversation.Messages), &messages); err != nil {
+		logger.Errorf("unmarshal conversation messages failed: %v", err)
+		return nil, fmt.Errorf("parse conversation messages failed: %w", err)
+	}
+
+	// 转换为字符串数组格式
+	history := make([]string, 0, len(messages))
+	for _, msg := range messages {
+		role, _ := msg["role"].(string)
+		content, _ := msg["content"].(string)
+
+		// 格式化为易读的格式
+		var roleLabel string
+		switch role {
+		case "user":
+			roleLabel = "User"
+		case "assistant":
+			roleLabel = "Assistant"
+		case "system":
+			roleLabel = "System"
+		case "tool":
+			roleLabel = "Tool"
+		default:
+			roleLabel = strings.Title(role)
+		}
+
+		history = append(history, fmt.Sprintf("[%s] %s", roleLabel, content))
+	}
+
+	return history, nil
 }
 
 func parseConversationSummary(raw string) (*conversationSummaryPayload, error) {
@@ -227,8 +260,23 @@ func sanitizeJSONBlock(raw string) string {
 func (h *Host) persistConversationSummary(ctx context.Context, conversationID string, payload *conversationSummaryPayload) error {
 	logger.Infof("persistConversationSummary conversation_id=%s summary_len=%d", conversationID, len(payload.Summary))
 	logger.Debugf("notes jsonb=%s", string(payload.NotesRaw))
-	// TODO: 将 payload.NotesRaw 作为 datatypes.JSON 或 json.RawMessage 写入 summaries 表
-	return nil
+
+	// 将标签转换为JSON
+	tagsJSON, err := json.Marshal(payload.Tags)
+	if err != nil {
+		return fmt.Errorf("marshal tags failed: %w", err)
+	}
+
+	// 创建摘要记录
+	summary := &model.Summaries{
+		ConversationID: conversationID,
+		SummaryText:    payload.Summary,
+		Tags:           string(tagsJSON),
+		ToolCalls:      string(payload.ToolCalls),
+		Notes:          string(payload.NotesRaw),
+	}
+
+	return h.templateRepository.CreateSummary(ctx, summary)
 }
 
 // summarizeConversation 承载实际的总结流程，由 Host.SummarizeConversation 调用。
@@ -236,7 +284,7 @@ func (h *Host) persistConversationSummary(ctx context.Context, conversationID st
 func (h *Host) summarizeConversation(conversationID string) (*SummarizeResult, error) {
 	logger.Infof("SummarizeConversation start conversation_id=%s", conversationID)
 
-	prompt, err := h.buildSummarizePrompt(conversationID)
+	prompt, err := h.buildSummarizePrompt(h.ctx, conversationID)
 	if err != nil {
 		return nil, err
 	}

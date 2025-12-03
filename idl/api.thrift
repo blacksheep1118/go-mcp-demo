@@ -119,6 +119,53 @@ struct GetConversationHistoryResponse {
     }'
 )
 
+struct ConversationItem {
+    1: string id(api.body="id", openapi.property='{
+        title: "对话ID",
+        type: "string"
+    }')
+    2: string title(api.body="title", openapi.property='{
+        title: "对话标题",
+        type: "string"
+    }')
+    3: i64 created_at(api.body="created_at", openapi.property='{
+        title: "创建时间",
+        type: "integer",
+        format: "int64"
+    }')
+    4: i64 updated_at(api.body="updated_at", openapi.property='{
+        title: "更新时间",
+        type: "integer",
+        format: "int64"
+    }')
+}(
+    openapi.schema='{
+        title: "对话信息",
+        description: "对话的基本信息"
+    }'
+)
+
+struct ListConversationsRequest {
+}(
+    openapi.schema='{
+        title: "获取对话列表请求",
+        description: "获取用户的所有对话列表"
+    }'
+)
+
+struct ListConversationsResponse {
+    1: list<ConversationItem> conversations(api.body="conversations", openapi.property='{
+        title: "对话列表",
+        type: "array"
+    }')
+}(
+    openapi.schema='{
+        title: "对话列表响应",
+        description: "返回对话列表",
+        required: ["conversations"]
+    }'
+)
+
 struct TemplateRequest{
     1: string templateId(api.body="templateId", openapi.property='{
         title: "示范用param",
@@ -569,6 +616,169 @@ struct DeleteTodoResponse {
     }'
 )
 
+// ==================== 知识库(Summarize)相关接口 ====================
+
+struct GetSummaryRequest {
+    1: string id(api.query="id", openapi.property='{
+        title: "摘要ID",
+        description: "要获取的摘要ID",
+        type: "string"
+    }')
+}(
+    openapi.schema='{
+        title: "获取摘要详情请求",
+        description: "根据ID获取摘要详情",
+        required: ["id"]
+    }'
+)
+
+struct SummaryItem {
+    1: string id(api.body="id", openapi.property='{
+        title: "摘要ID",
+        type: "string"
+    }')
+    2: string conversation_id(api.body="conversation_id", openapi.property='{
+        title: "对话ID",
+        type: "string"
+    }')
+    3: string summary_text(api.body="summary_text", openapi.property='{
+        title: "摘要内容",
+        type: "string"
+    }')
+    4: list<string> tags(api.body="tags", openapi.property='{
+        title: "标签列表",
+        type: "array"
+    }')
+    5: string tool_calls_json(api.body="tool_calls_json", openapi.property='{
+        title: "工具调用JSON",
+        type: "string"
+    }')
+    6: map<string,string> notes(api.body="notes", openapi.property='{
+        title: "笔记",
+        type: "object"
+    }')
+    7: i64 created_at(api.body="created_at", openapi.property='{
+        title: "创建时间",
+        type: "integer",
+        format: "int64"
+    }')
+    8: i64 updated_at(api.body="updated_at", openapi.property='{
+        title: "更新时间",
+        type: "integer",
+        format: "int64"
+    }')
+}(
+    openapi.schema='{
+        title: "摘要详细信息",
+        description: "摘要的详细信息"
+    }'
+)
+
+struct GetSummaryResponse {
+    1: SummaryItem summary(api.body="summary", openapi.property='{
+        title: "摘要信息",
+        type: "object"
+    }')
+}(
+    openapi.schema='{
+        title: "获取摘要详情响应",
+        description: "返回摘要详细信息",
+        required: ["summary"]
+    }'
+)
+
+struct ListSummaryRequest {
+}(
+    openapi.schema='{
+        title: "获取摘要列表请求",
+        description: "获取用户的所有摘要"
+    }'
+)
+
+struct ListSummaryResponse {
+    1: list<SummaryItem> summaries(api.body="summaries", openapi.property='{
+        title: "摘要列表",
+        type: "array"
+    }')
+}(
+    openapi.schema='{
+        title: "摘要列表响应",
+        description: "返回摘要列表",
+        required: ["summaries"]
+    }'
+)
+
+struct UpdateSummaryRequest {
+    1: string id(api.body="id", openapi.property='{
+        title: "摘要ID",
+        description: "要更新的摘要ID",
+        type: "string"
+    }')
+    2: optional string summary_text(api.body="summary_text", openapi.property='{
+        title: "摘要内容",
+        type: "string"
+    }')
+    3: optional list<string> tags(api.body="tags", openapi.property='{
+        title: "标签列表",
+        type: "array"
+    }')
+    4: optional string tool_calls_json(api.body="tool_calls_json", openapi.property='{
+        title: "工具调用JSON",
+        type: "string"
+    }')
+    5: optional map<string,string> notes(api.body="notes", openapi.property='{
+        title: "笔记",
+        type: "object"
+    }')
+}(
+    openapi.schema='{
+        title: "更新摘要请求",
+        description: "更新摘要信息，只传需要更新的字段",
+        required: ["id"]
+    }'
+)
+
+struct UpdateSummaryResponse {
+    1: string id(api.body="id", openapi.property='{
+        title: "摘要ID",
+        type: "string"
+    }')
+}(
+    openapi.schema='{
+        title: "更新摘要响应",
+        description: "返回更新成功的摘要ID",
+        required: ["id"]
+    }'
+)
+
+struct DeleteSummaryRequest {
+    1: string id(api.query="id", openapi.property='{
+        title: "摘要ID",
+        description: "要删除的摘要ID",
+        type: "string"
+    }')
+}(
+    openapi.schema='{
+        title: "删除摘要请求",
+        description: "根据ID删除摘要",
+        required: ["id"]
+    }'
+)
+
+struct DeleteSummaryResponse {
+    1: string id(api.body="id", openapi.property='{
+        title: "摘要ID",
+        description: "已删除的摘要ID",
+        type: "string"
+    }')
+}(
+    openapi.schema='{
+        title: "删除摘要响应",
+        description: "返回已删除的摘要ID",
+        required: ["id"]
+    }'
+)
+
 struct CourseListRequest {
     1: required string term(api.query="term", openapi.property='{
         title: "学期",
@@ -635,6 +845,8 @@ service ApiService {
     TemplateResponse Template(1: TemplateRequest req)(api.post="/api/v1/template")
     // 获取会话历史
     GetConversationHistoryResponse GetConversationHistory(1: GetConversationHistoryRequest req)(api.get="/api/v1/conversation/history")
+    // 获取对话列表
+    ListConversationsResponse ListConversations(1: ListConversationsRequest req)(api.get="/api/v1/conversation/list")
     // 会话总结
     SummarizeConversationResponse SummarizeConversation(1: SummarizeConversationRequest req)(api.post="/api/v1/conversation/summarize")
     // 获取jwch登录数据
@@ -655,6 +867,16 @@ service ApiService {
     UpdateTodoResponse UpdateTodo(1: UpdateTodoRequest req)(api.put="/api/v1/todo/update")
     // 删除待办事项
     DeleteTodoResponse DeleteTodo(1: DeleteTodoRequest req)(api.delete="/api/v1/todo/delete")
+
+    // 知识库(摘要)管理
+    // 获取摘要详情
+    GetSummaryResponse GetSummary(1: GetSummaryRequest req)(api.get="/api/v1/summary/detail")
+    // 获取所有摘要列表
+    ListSummaryResponse ListSummary(1: ListSummaryRequest req)(api.get="/api/v1/summary/list")
+    // 更新摘要
+    UpdateSummaryResponse UpdateSummary(1: UpdateSummaryRequest req)(api.put="/api/v1/summary/update")
+    // 删除摘要
+    DeleteSummaryResponse DeleteSummary(1: DeleteSummaryRequest req)(api.delete="/api/v1/summary/delete")
 
     // 课程相关接口
     // 获取课表

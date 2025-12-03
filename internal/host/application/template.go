@@ -1,6 +1,7 @@
 package application
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/FantasyRL/go-mcp-demo/api/model/api"
@@ -147,4 +148,82 @@ func (h *Host) UpdateTodoLogic(req *api.UpdateTodoRequest, userID string) error 
 // DeleteTodoLogic 删除待办事项
 func (h *Host) DeleteTodoLogic(id string, userID string) error {
 	return h.templateRepository.DeleteTodo(h.ctx, id, userID)
+}
+
+// ==================== Summarize 相关业务逻辑 ====================
+
+// GetSummaryLogic 获取摘要详情
+func (h *Host) GetSummaryLogic(id string) (*model.Summaries, error) {
+	summary, err := h.templateRepository.GetSummaryByID(h.ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if summary == nil {
+		return nil, errno.NewErrNo(errno.BizNotExist, "摘要不存在")
+	}
+	return summary, nil
+}
+
+// ListSummaryLogic 获取用户的所有摘要列表
+func (h *Host) ListSummaryLogic(userID string) ([]*model.Summaries, error) {
+	return h.templateRepository.ListSummariesByUserID(h.ctx, userID)
+}
+
+// UpdateSummaryLogic 更新摘要
+func (h *Host) UpdateSummaryLogic(req *api.UpdateSummaryRequest) error {
+	// 先查询摘要是否存在
+	summary, err := h.templateRepository.GetSummaryByID(h.ctx, req.ID)
+	if err != nil {
+		return err
+	}
+	if summary == nil {
+		return errno.NewErrNo(errno.BizNotExist, "摘要不存在")
+	}
+
+	// 更新字段
+	if req.SummaryText != nil {
+		summary.SummaryText = *req.SummaryText
+	}
+
+	if req.Tags != nil {
+		tagsJSON, err := json.Marshal(req.Tags)
+		if err != nil {
+			return errno.NewErrNo(errno.ParamFormatCode, "标签格式错误")
+		}
+		summary.Tags = string(tagsJSON)
+	}
+
+	if req.ToolCallsJSON != nil {
+		// 验证是否为有效JSON
+		var temp interface{}
+		if err := json.Unmarshal([]byte(*req.ToolCallsJSON), &temp); err != nil {
+			return errno.NewErrNo(errno.ParamFormatCode, "工具调用JSON格式错误")
+		}
+		summary.ToolCalls = *req.ToolCallsJSON
+	}
+
+	if req.Notes != nil {
+		notesJSON, err := json.Marshal(req.Notes)
+		if err != nil {
+			return errno.NewErrNo(errno.ParamFormatCode, "笔记格式错误")
+		}
+		summary.Notes = string(notesJSON)
+	}
+
+	// 更新摘要
+	return h.templateRepository.UpdateSummary(h.ctx, summary)
+}
+
+// DeleteSummaryLogic 删除摘要
+func (h *Host) DeleteSummaryLogic(id string) error {
+	// 先查询摘要是否存在
+	summary, err := h.templateRepository.GetSummaryByID(h.ctx, id)
+	if err != nil {
+		return err
+	}
+	if summary == nil {
+		return errno.NewErrNo(errno.BizNotExist, "摘要不存在")
+	}
+
+	return h.templateRepository.DeleteSummary(h.ctx, id)
 }

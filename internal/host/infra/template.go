@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"github.com/FantasyRL/go-mcp-demo/pkg/constant"
 	"github.com/FantasyRL/go-mcp-demo/pkg/logger"
 	"github.com/bytedance/sonic"
@@ -189,6 +190,21 @@ func (r *TemplateRepository) GetConversationByID(ctx context.Context, id string)
 	return conv, nil
 }
 
+// ListConversationsByUserID 获取用户的所有对话列表
+func (r *TemplateRepository) ListConversationsByUserID(ctx context.Context, userID string) ([]*model.Conversations, error) {
+	d := r.db.Get(ctx)
+	conversations, err := d.WithContext(ctx).Conversations.
+		Where(d.Conversations.UserID.Eq(userID)).
+		Order(d.Conversations.UpdatedAt.Desc()).
+		Find()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return conversations, nil
+}
+
 // CreateTodo 创建待办事项
 func (r *TemplateRepository) CreateTodo(ctx context.Context, todo *model.Todolists) error {
 	d := r.db.Get(ctx)
@@ -326,6 +342,83 @@ func (r *TemplateRepository) DeleteTodo(ctx context.Context, id string, userID s
 	_, err = d.WithContext(ctx).Todolists.
 		Where(d.Todolists.ID.Eq(id)).
 		Where(d.Todolists.UserID.Eq(userID)).
+		Delete()
+
+	return err
+}
+
+// ==================== Summarize 相关方法 ====================
+
+// CreateSummary 创建摘要
+func (r *TemplateRepository) CreateSummary(ctx context.Context, summary *model.Summaries) error {
+	d := r.db.Get(ctx)
+	return d.WithContext(ctx).Summaries.Create(summary)
+}
+
+// GetSummaryByID 通过ID获取摘要
+func (r *TemplateRepository) GetSummaryByID(ctx context.Context, id string) (*model.Summaries, error) {
+	d := r.db.Get(ctx)
+	summary, err := d.WithContext(ctx).Summaries.
+		Where(d.Summaries.ID.Eq(id)).
+		First()
+
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return summary, nil
+}
+
+// ListSummariesByUserID 获取用户的所有摘要列表（通过conversation关联）
+func (r *TemplateRepository) ListSummariesByUserID(ctx context.Context, userID string) ([]*model.Summaries, error) {
+	d := r.db.Get(ctx)
+	// 先获取用户的所有conversation_id
+	conversations, err := d.WithContext(ctx).Conversations.
+		Where(d.Conversations.UserID.Eq(userID)).
+		Select(d.Conversations.ID).
+		Find()
+
+	if err != nil {
+		return nil, err
+	}
+
+	// 如果用户没有对话，返回空列表
+	if len(conversations) == 0 {
+		return []*model.Summaries{}, nil
+	}
+
+	// 提取所有conversation_id
+	conversationIDs := make([]string, 0, len(conversations))
+	for _, conv := range conversations {
+		conversationIDs = append(conversationIDs, conv.ID)
+	}
+
+	// 查询这些conversation_id对应的summaries
+	summaries, err := d.WithContext(ctx).Summaries.
+		Where(d.Summaries.ConversationID.In(conversationIDs...)).
+		Order(d.Summaries.CreatedAt.Desc()).
+		Find()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return summaries, nil
+}
+
+// UpdateSummary 更新摘要
+func (r *TemplateRepository) UpdateSummary(ctx context.Context, summary *model.Summaries) error {
+	d := r.db.Get(ctx)
+	return d.WithContext(ctx).Summaries.Save(summary)
+}
+
+// DeleteSummary 删除摘要（软删除）
+func (r *TemplateRepository) DeleteSummary(ctx context.Context, id string) error {
+	d := r.db.Get(ctx)
+	_, err := d.WithContext(ctx).Summaries.
+		Where(d.Summaries.ID.Eq(id)).
 		Delete()
 
 	return err

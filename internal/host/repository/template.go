@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/west2-online/jwch"
 
 	"github.com/FantasyRL/go-mcp-demo/pkg/gorm-gen/model"
@@ -22,6 +23,8 @@ type TemplateRepository interface {
 	UpsertConversation(ctx context.Context, userID string, conversationID string, openaiMessages []openai.ChatCompletionMessageParamUnion) error
 	// GetConversationByID 通过ID获取对话记录
 	GetConversationByID(ctx context.Context, id string) (*model.Conversations, error)
+	// ListConversationsByUserID 获取用户的所有对话列表
+	ListConversationsByUserID(ctx context.Context, userID string) ([]*model.Conversations, error)
 
 	// CreateTodo 创建待办事项
 	CreateTodo(ctx context.Context, todo *model.Todolists) error
@@ -41,6 +44,17 @@ type TemplateRepository interface {
 	UpdateTodo(ctx context.Context, todo *model.Todolists) error
 	// DeleteTodo 删除待办事项
 	DeleteTodo(ctx context.Context, id string, userID string) error
+
+	// CreateSummary 创建摘要
+	CreateSummary(ctx context.Context, summary *model.Summaries) error
+	// GetSummaryByID 通过ID获取摘要
+	GetSummaryByID(ctx context.Context, id string) (*model.Summaries, error)
+	// ListSummariesByUserID 获取用户的所有摘要列表（通过conversation关联）
+	ListSummariesByUserID(ctx context.Context, userID string) ([]*model.Summaries, error)
+	// UpdateSummary 更新摘要
+	UpdateSummary(ctx context.Context, summary *model.Summaries) error
+	// DeleteSummary 删除摘要
+	DeleteSummary(ctx context.Context, id string) error
 
 	/*
 		redis related methods
