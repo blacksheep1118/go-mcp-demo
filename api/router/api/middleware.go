@@ -24,12 +24,14 @@ func _v1Mw() []app.HandlerFunc {
 func _chatMw() []app.HandlerFunc {
 	return []app.HandlerFunc{
 		mw.Auth(),
+		mw.GetHeaderParams(),
 	}
 }
 
 func _chat0Mw() []app.HandlerFunc {
 	return []app.HandlerFunc{
 		mw.Auth(),
+		mw.GetHeaderParams(),
 	}
 }
 
