@@ -4,6 +4,7 @@ import (
 	"github.com/FantasyRL/go-mcp-demo/pkg/base/ai_provider"
 	"github.com/FantasyRL/go-mcp-demo/pkg/base/mcp_client"
 	"github.com/FantasyRL/go-mcp-demo/pkg/base/registry"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 	"sync"
 )
@@ -20,6 +21,7 @@ type ClientSet struct {
 	AiProviderCli    *ai_provider.Client
 	RegistryResolver registry.Resolver
 	ActualDB         *gorm.DB
+	Cache            *redis.Client
 	cleanups         []func()
 }
 

@@ -30,7 +30,7 @@ func NewHost(ctx context.Context, clientSet *base.ClientSet) *Host {
 		ctx:                ctx,
 		mcpCli:             clientSet.MCPCli,
 		aiProviderCli:      clientSet.AiProviderCli,
-		templateRepository: infra.NewTemplateRepository(db.NewDBWithQuery(clientSet.ActualDB, query.Use)),
+		templateRepository: infra.NewTemplateRepository(db.NewDBWithQuery(clientSet.ActualDB, query.Use), clientSet.Cache),
 	}
 }
 

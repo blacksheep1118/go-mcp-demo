@@ -383,3 +383,43 @@ func DeleteTodo(ctx context.Context, c *app.RequestContext) {
 	}
 	pack.RespData(c, resp)
 }
+
+// GetCourseList .
+// @router /api/v1/course/list [GET]
+func GetCourseList(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.CourseListRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	course, err := application.NewHost(ctx, clientSet).GetCourseList(&req)
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespList(c, course)
+}
+
+// GetTermList .
+// @router /api/v1/course/term/list [GET]
+func GetTermList(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req api.CourseTermListRequest
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	terms, err := application.NewHost(ctx, clientSet).GetTermsList()
+	if err != nil {
+		pack.RespError(c, err)
+		return
+	}
+
+	pack.RespList(c, terms)
+}

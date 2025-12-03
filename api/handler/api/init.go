@@ -12,5 +12,6 @@ func Init() {
 		base.WithMCPClient([]string{constant.ServiceNameMCPLocal, constant.ServiceNameMCPRemote}),
 		base.WithAiProviderClient(),
 		base.WithDB(),
+		base.WithCache(),
 	)
 }

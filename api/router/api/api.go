@@ -31,6 +31,10 @@ func Register(r *server.Hertz) {
 				_conversation.POST("/summarize", append(_summarizeconversationMw(), api.SummarizeConversation)...)
 			}
 			{
+				_course := _v1.Group("/course", _courseMw()...)
+				_course.GET("/list", append(_getcourselistMw(), api.GetCourseList)...)
+			}
+			{
 				_todo := _v1.Group("/todo", _todoMw()...)
 				_todo.POST("/create", append(_createtodoMw(), api.CreateTodo)...)
 				_todo.DELETE("/delete", append(_deletetodoMw(), api.DeleteTodo)...)

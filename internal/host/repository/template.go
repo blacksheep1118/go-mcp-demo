@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"github.com/west2-online/jwch"
 
 	"github.com/FantasyRL/go-mcp-demo/pkg/gorm-gen/model"
 	"github.com/openai/openai-go/v2"
@@ -9,6 +10,10 @@ import (
 
 // TemplateRepository 根据实际需求定义上层访问的接口，在下层infra做具体方法的实现
 type TemplateRepository interface {
+	/*
+		database related methods
+	*/
+
 	// CreateUserByIDAndName 这里定义一些示例方法，这样就可以先编排逻辑了，后面再去下层实现接口
 	CreateUserByIDAndName(ctx context.Context, id string, name string) (*model.Users, error)
 	// GetUserByID 通过ID获取用户信息
@@ -36,4 +41,18 @@ type TemplateRepository interface {
 	UpdateTodo(ctx context.Context, todo *model.Todolists) error
 	// DeleteTodo 删除待办事项
 	DeleteTodo(ctx context.Context, id string, userID string) error
+
+	/*
+		redis related methods
+	*/
+	// IsKeyExist 判断缓存中是否存在某个 key
+	IsKeyExist(ctx context.Context, key string) bool
+	// GetTermsCache 获取学期列表缓存
+	GetTermsCache(ctx context.Context, key string) (terms []string, err error)
+	// GetCoursesCache 获取课程列表缓存
+	GetCoursesCache(ctx context.Context, key string) (course []*jwch.Course, err error)
+	// SetCoursesCache 设置课程列表缓存
+	SetCoursesCache(ctx context.Context, key string, course []*jwch.Course) error
+	// SetTermsCache 设置学期列表缓存
+	SetTermsCache(ctx context.Context, key string, info []string) error
 }
