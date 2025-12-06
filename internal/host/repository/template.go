@@ -53,6 +53,8 @@ type TemplateRepository interface {
 	CreateSummary(ctx context.Context, summary *model.Summaries) error
 	// GetSummaryByID 通过ID获取摘要
 	GetSummaryByID(ctx context.Context, id string) (*model.Summaries, error)
+	// GetSummaryByConversationID 通过对话ID获取摘要
+	GetSummaryByConversationID(ctx context.Context, conversationID string) (*model.Summaries, error)
 	// ListSummariesByUserID 获取用户的所有摘要列表（通过conversation关联）
 	ListSummariesByUserID(ctx context.Context, userID string) ([]*model.Summaries, error)
 	// UpdateSummary 更新摘要

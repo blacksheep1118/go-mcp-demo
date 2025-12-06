@@ -379,6 +379,22 @@ func (r *TemplateRepository) GetSummaryByID(ctx context.Context, id string) (*mo
 	return summary, nil
 }
 
+// GetSummaryByConversationID 通过对话ID获取摘要
+func (r *TemplateRepository) GetSummaryByConversationID(ctx context.Context, conversationID string) (*model.Summaries, error) {
+	d := r.db.Get(ctx)
+	summary, err := d.WithContext(ctx).Summaries.
+		Where(d.Summaries.ConversationID.Eq(conversationID)).
+		First()
+
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return summary, nil
+}
+
 // ListSummariesByUserID 获取用户的所有摘要列表（通过conversation关联）
 func (r *TemplateRepository) ListSummariesByUserID(ctx context.Context, userID string) ([]*model.Summaries, error) {
 	d := r.db.Get(ctx)
@@ -434,9 +450,9 @@ func (r *TemplateRepository) DeleteSummary(ctx context.Context, id string) error
 
 // DeleteConversation 删除会话（软删除）
 func (r *TemplateRepository) DeleteConversation(ctx context.Context, id string) error {
-    d := r.db.Get(ctx)
-    _, err := d.WithContext(ctx).Conversations.
-        Where(d.Conversations.ID.Eq(id)).
-        Delete()
-    return err
+	d := r.db.Get(ctx)
+	_, err := d.WithContext(ctx).Conversations.
+		Where(d.Conversations.ID.Eq(id)).
+		Delete()
+	return err
 }
