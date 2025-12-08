@@ -211,6 +211,9 @@ func _scheduleMw() []app.HandlerFunc {
 }
 
 func _dailyscheduleMw() []app.HandlerFunc {
-	// your code...
+	return []app.HandlerFunc{
+		mw.Auth(),
+		mw.GetHeaderParams(),
+	}
 	return nil
 }
